@@ -94,11 +94,11 @@ void atg_scs::RigidBodySystem::process(double dt) {
         for (int j = 0; j < n_sub; ++j, ++c_i) {
             for (int k = 0; k < m_constraints[i]->m_bodyCount; ++k) {
                 m_constraints[i]->m_f_x[k][j] =
-                    R.get(c_i, m_constraints[i]->m_bodies[k] * 3 + 0);
+                    R.get(c_i, m_constraints[i]->m_bodies[k]->index * 3 + 0);
                 m_constraints[i]->m_f_x[k][j] =
-                    R.get(c_i, m_constraints[i]->m_bodies[k] * 3 + 1);
+                    R.get(c_i, m_constraints[i]->m_bodies[k]->index * 3 + 1);
                 m_constraints[i]->m_t[k][j] =
-                    R.get(c_i, m_constraints[i]->m_bodies[k] * 3 + 2);
+                    R.get(c_i, m_constraints[i]->m_bodies[k]->index * 3 + 2);
             }
         }
     }

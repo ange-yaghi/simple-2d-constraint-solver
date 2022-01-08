@@ -21,21 +21,37 @@ atg_scs::Matrix::~Matrix() {
 }
 
 void atg_scs::Matrix::initialize(int width, int height, double value) {
-    destroy();
-
-    m_height = height;
-    m_width = width;
-
-    m_data = new double[(size_t)width * height];
-    m_matrix = new double *[height];
-    for (int i = 0; i < height; ++i) {
-        m_matrix[i] = &m_data[i * width];
-    }
+    resize(width, height);
 
     for (int i = 0; i < height; ++i) {
         for (int j = 0; j < width; ++j) {
             m_matrix[i][j] = value;
         }
+    }
+}
+
+void atg_scs::Matrix::resize(int width, int height) {
+    if (width == m_width && height == m_height) return;
+    else if (width > m_capacityWidth || height > m_capacityHeight) {
+        destroy();
+
+        m_capacityWidth = (width > m_capacityWidth)
+            ? width
+            : m_capacityWidth;
+
+        m_capacityHeight = (height > m_capacityHeight)
+            ? height
+            : m_capacityHeight;
+
+        m_data = new double[(size_t)m_capacityWidth * m_capacityHeight];
+        m_matrix = new double *[m_capacityHeight];
+    }
+
+    m_height = height;
+    m_width = width;
+
+    for (int i = 0; i < height; ++i) {
+        m_matrix[i] = &m_data[i * width];
     }
 }
 
@@ -68,8 +84,7 @@ double atg_scs::Matrix::get(int column, int row) {
 }
 
 void atg_scs::Matrix::set(Matrix *reference) {
-    assert(m_width == reference->m_width);
-    assert(m_height == reference->m_height);
+    resize(reference->m_width, reference->m_height);
 
     for (int i = 0; i < reference->m_height; ++i) {
         for (int j = 0; j < reference->m_width; ++j) {
@@ -80,8 +95,8 @@ void atg_scs::Matrix::set(Matrix *reference) {
 
 void atg_scs::Matrix::multiply(Matrix &b, Matrix *target) {
     assert(m_width == b.m_height);
-    assert(target->m_width == b.m_width);
-    assert(target->m_height == m_height);
+
+    target->resize(b.m_width, m_height);
 
     for (int i = 0; i < m_height; ++i) {
         for (int j = 0; j < b.m_width; ++j) {
@@ -98,8 +113,8 @@ void atg_scs::Matrix::multiply(Matrix &b, Matrix *target) {
 void atg_scs::Matrix::subtract(Matrix &b, Matrix *target) {
     assert(b.m_width == m_width);
     assert(b.m_height = m_height);
-    assert(target->m_width == m_width);
-    assert(target->m_height == m_height);
+
+    target->resize(m_width, m_height);
 
     for (int i = 0; i < m_height; ++i) {
         for (int j = 0; j < m_width; ++j) {
@@ -109,8 +124,7 @@ void atg_scs::Matrix::subtract(Matrix &b, Matrix *target) {
 }
 
 void atg_scs::Matrix::negate(Matrix *target) {
-    assert(target->m_width == m_width);
-    assert(target->m_height == m_height);
+    target->resize(m_width, m_height);
 
     for (int i = 0; i < m_height; ++i) {
         for (int j = 0; j < m_width; ++j) {
@@ -120,8 +134,7 @@ void atg_scs::Matrix::negate(Matrix *target) {
 }
 
 void atg_scs::Matrix::transpose(Matrix *target) {
-    assert(target->m_width == m_height);
-    assert(target->m_height == m_width);
+    target->resize(m_height, m_width);
 
     for (int i = 0; i < m_width; ++i) {
         for (int j = 0; j < m_height; ++j) {

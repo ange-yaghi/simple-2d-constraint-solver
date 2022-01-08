@@ -1,0 +1,28 @@
+#ifndef ATG_SIMPLE_2D_CONSTRAINT_SOLVER_RIGID_BODY_H
+#define ATG_SIMPLE_2D_CONSTRAINT_SOLVER_RIGID_BODY_H
+
+namespace atg_scs {
+    struct RigidBody {
+        public:
+            RigidBody();
+            ~RigidBody();
+
+            double p_x;
+            double p_y;
+
+            double v_x;
+            double v_y;
+
+            double theta;
+            double v_theta;
+
+            double m;
+            double I;
+
+            int index;
+
+            double energy() const;
+    };
+} /* namespace atg_scs */
+
+#endif /* ATG_SIMPLE_2D_CONSTRAINT_SOLVER_RIGID_BODY_H */

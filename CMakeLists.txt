@@ -31,10 +31,32 @@ add_library(simple-2d-constraint-solver STATIC
     # Source files
     src/rigid_body_system.cpp
     src/matrix.cpp
+    src/system_state.cpp
+    src/utilities.cpp
+    src/ode_solver.cpp
+    src/euler_ode_solver.cpp
+    src/rk4_ode_solver.cpp
+    src/constraint.cpp
+    src/force_generator.cpp
+    src/rigid_body.cpp
+    src/sle_solver.cpp
+    src/gauss_seidel_sle_solver.cpp
+    src/fixed_position_constraint.cpp
 
     # Header files
     include/rigid_body_system.h
     include/matrix.h
+    include/utilities.h
+    include/system_state.h
+    include/ode_solver.h
+    include/euler_ode_solver.h
+    include/rk4_ode_solver.h
+    include/constraint.h
+    include/force_generator.h
+    include/rigid_body.h
+    include/sle_solver.h
+    include/gauss_seidel_sle_solver.h
+    include/fixed_position_constraint.h
 )
 
 # GTEST
@@ -44,6 +66,9 @@ enable_testing()
 add_executable(simple-2d-constraint-solver-test
     test/sanity_tests.cpp
     test/matrix_tests.cpp
+    test/euler_ode_solver_tests.cpp
+    test/rk4_ode_solver_tests.cpp
+    test/gauss_seidel_sle_solver_tests.cpp
 )
 
 target_link_libraries(simple-2d-constraint-solver-test

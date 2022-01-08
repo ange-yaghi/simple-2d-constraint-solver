@@ -9,6 +9,7 @@ namespace atg_scs {
             ~Matrix();
 
             void initialize(int width, int height, double value = 0.0);
+            void resize(int width, int height);
             void destroy();
             void set(int column, int row, double value);
             void set(const double *data);
@@ -29,6 +30,8 @@ namespace atg_scs {
             double *m_data;
             int m_width;
             int m_height;
+            int m_capacityWidth;
+            int m_capacityHeight;
     };
 } /* namespace atg_scs */
 

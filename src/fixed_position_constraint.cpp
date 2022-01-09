@@ -18,7 +18,7 @@ void atg_scs::FixedPositionConstraint::calculate(
         int body,
         SystemState *state)
 {
-    if (body == m_bodies[0]->index) {
+    if (body != m_bodies[0]->index) {
         output->n = 0;
         return;
     }

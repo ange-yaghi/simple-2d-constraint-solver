@@ -42,6 +42,7 @@ add_library(simple-2d-constraint-solver STATIC
     src/sle_solver.cpp
     src/gauss_seidel_sle_solver.cpp
     src/fixed_position_constraint.cpp
+    src/static_force_generator.cpp
 
     # Header files
     include/rigid_body_system.h
@@ -57,6 +58,7 @@ add_library(simple-2d-constraint-solver STATIC
     include/sle_solver.h
     include/gauss_seidel_sle_solver.h
     include/fixed_position_constraint.h
+    include/static_force_generator.h
 )
 
 # GTEST

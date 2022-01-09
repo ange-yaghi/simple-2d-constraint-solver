@@ -20,8 +20,7 @@ bool atg_scs::GaussSeidelSleSolver::solve(
 {
     const int n = right.getHeight();
     
-    assert(result->getWidth() == 1);
-    assert(result->getHeight() == n);
+    result->resize(1, n);
 
     if (previous != nullptr && previous->getHeight() == n) {
         result->set(previous);

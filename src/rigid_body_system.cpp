@@ -57,9 +57,6 @@ void atg_scs::RigidBodySystem::process(double dt) {
     populateSystemState();
     populateMassMatrices();
 
-    Matrix lambda(1, m_f, 0.0);
-    Matrix R(m_f, n * 3, 0.0);
-
     const int steps = 1;
     for (int i = 0; i < steps; ++i) {
         m_odeSolver->start(&m_state, dt / steps);
@@ -94,14 +91,23 @@ void atg_scs::RigidBodySystem::process(double dt) {
         for (int j = 0; j < n_sub; ++j, ++c_i) {
             for (int k = 0; k < m_constraints[i]->m_bodyCount; ++k) {
                 m_constraints[i]->m_f_x[k][j] =
-                    R.get(c_i, m_constraints[i]->m_bodies[k]->index * 3 + 0);
+                    m_iv.R.get(c_i, m_constraints[i]->m_bodies[k]->index * 3 + 0);
                 m_constraints[i]->m_f_x[k][j] =
-                    R.get(c_i, m_constraints[i]->m_bodies[k]->index * 3 + 1);
+                    m_iv.R.get(c_i, m_constraints[i]->m_bodies[k]->index * 3 + 1);
                 m_constraints[i]->m_t[k][j] =
-                    R.get(c_i, m_constraints[i]->m_bodies[k]->index * 3 + 2);
+                    m_iv.R.get(c_i, m_constraints[i]->m_bodies[k]->index * 3 + 2);
             }
         }
     }
+}
+
+int atg_scs::RigidBodySystem::getFullConstraintCount() const {
+    int count = 0;
+    for (Constraint *constraint: m_constraints) {
+        count += constraint->m_constraintCount;
+    }
+
+    return count;
 }
 
 void atg_scs::RigidBodySystem::populateSystemState() {
@@ -164,10 +170,10 @@ void atg_scs::RigidBodySystem::processConstraints() {
         m_iv.q_dot.set(0, i * 3 + 2, m_state.v_theta[i]);
     }
 
-    m_iv.J.resize(3 * n, m_f);
-    m_iv.J_dot.resize(3 * n, m_f);
-    m_iv.C_ks.resize(1, m_f);
-    m_iv.C_kd.resize(1, m_f);
+    m_iv.J.initialize(3 * n, m_f, 0.0);
+    m_iv.J_dot.initialize(3 * n, m_f, 0.0);
+    m_iv.C_ks.initialize(1, m_f, 0.0);
+    m_iv.C_kd.initialize(1, m_f, 0.0);
 
     Constraint::Output constraintOutput;
     int c_i = 0;
@@ -202,11 +208,11 @@ void atg_scs::RigidBodySystem::processConstraints() {
 
     m_iv.J.transpose(&m_iv.J_T);
 
-    Matrix F_ext(1, 3 * n, 0.0);
+    m_iv.F_ext.initialize(1, 3 * n, 0.0);
     for (int i = 0; i < n; ++i) {
-        F_ext.set(0, i * 3 + 0, m_state.f_x[i]);
-        F_ext.set(0, i * 3 + 1, m_state.f_y[i]);
-        F_ext.set(0, i * 3 + 2, m_state.t[i]);
+        m_iv.F_ext.set(0, i * 3 + 0, m_state.f_x[i]);
+        m_iv.F_ext.set(0, i * 3 + 1, m_state.f_y[i]);
+        m_iv.F_ext.set(0, i * 3 + 2, m_state.t[i]);
     }
 
     m_iv.J.multiply(m_iv.M_inv, &m_iv.reg0);
@@ -216,7 +222,7 @@ void atg_scs::RigidBodySystem::processConstraints() {
     m_iv.reg0.negate(&m_iv.reg1);
 
     m_iv.J.multiply(m_iv.M_inv, &m_iv.reg2);
-    m_iv.reg2.multiply(F_ext, &m_iv.reg0);
+    m_iv.reg2.multiply(m_iv.F_ext, &m_iv.reg0);
 
     m_iv.reg1.subtract(m_iv.reg0, &m_iv.reg2);
     m_iv.reg2.subtract(m_iv.C_ks, &m_iv.reg1);
@@ -240,10 +246,10 @@ void atg_scs::RigidBodySystem::processConstraints() {
         const double invInertia = m_iv.M_inv.get(i * 3 + 2, i * 3 + 2);
 
         m_state.a_x[i] =
-            invMass * (m_iv.F_C.get(0, i * 3 + 0) + F_ext.get(0, i * 3 + 0));
+            invMass * (m_iv.F_C.get(0, i * 3 + 0) + m_iv.F_ext.get(0, i * 3 + 0));
         m_state.a_y[i] =
-            invMass * (m_iv.F_C.get(0, i * 3 + 1) + F_ext.get(0, i * 3 + 1));
+            invMass * (m_iv.F_C.get(0, i * 3 + 1) + m_iv.F_ext.get(0, i * 3 + 1));
         m_state.a_theta[i] =
-            invInertia * (m_iv.F_C.get(0, i * 3 + 2) + F_ext.get(0, i * 3 + 2));
+            invInertia * (m_iv.F_C.get(0, i * 3 + 2) + m_iv.F_ext.get(0, i * 3 + 2));
     }
 }

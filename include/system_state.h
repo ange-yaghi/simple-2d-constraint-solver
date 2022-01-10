@@ -26,6 +26,8 @@ namespace atg_scs {
             double *f_y;
             double *t;
 
+            double *m;
+
             int n;
             double dt;
     };

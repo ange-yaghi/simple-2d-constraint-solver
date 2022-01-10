@@ -21,6 +21,7 @@ namespace atg_scs {
 
             int index;
 
+            void reset();
             double energy() const;
     };
 } /* namespace atg_scs */

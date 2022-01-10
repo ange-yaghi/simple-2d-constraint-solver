@@ -1,16 +1,8 @@
 #include "../include/rigid_body.h"
 
 atg_scs::RigidBody::RigidBody() {
-    p_x = p_y = 0.0;
-    v_x = v_y = 0.0;
-
-    theta = 0.0;
-    v_theta = 0.0;
-
     index = 0;
-
-    m = 0.0;
-    I = 0.0;
+    reset();
 }
 
 atg_scs::RigidBody::~RigidBody() {
@@ -23,4 +15,15 @@ double atg_scs::RigidBody::energy() const {
     const double E_r = 0.5 * I * v_theta * v_theta;
 
     return E_k + E_r;
+}
+
+void atg_scs::RigidBody::reset() {
+    p_x = p_y = 0.0;
+    v_x = v_y = 0.0;
+
+    theta = 0.0;
+    v_theta = 0.0;
+
+    m = 0.0;
+    I = 0.0;
 }

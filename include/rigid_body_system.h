@@ -18,6 +18,7 @@ namespace atg_scs {
             ~RigidBodySystem();
 
             void initialize(SleSolver *sleSolver, OdeSolver *odeSolver);
+            void reset();
 
             void addRigidBody(RigidBody *body);
             void removeRigidBody(RigidBody *body);
@@ -28,7 +29,7 @@ namespace atg_scs {
             void addForceGenerator(ForceGenerator *generator);
             void removeForceGenerator(ForceGenerator *generator);
 
-            void process(double dt);
+            void process(double dt, int steps = 1);
 
             int getRigidBodyCount() const { return (int)m_rigidBodies.size(); }
             int getConstraintCount() const { return (int)m_constraints.size(); }

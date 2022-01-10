@@ -43,6 +43,9 @@ add_library(simple-2d-constraint-solver STATIC
     src/gauss_seidel_sle_solver.cpp
     src/fixed_position_constraint.cpp
     src/static_force_generator.cpp
+    src/gravity_force_generator.cpp
+    src/link_constraint.cpp
+    src/gaussian_elimination_sle_solver.cpp
 
     # Header files
     include/rigid_body_system.h
@@ -59,6 +62,9 @@ add_library(simple-2d-constraint-solver STATIC
     include/gauss_seidel_sle_solver.h
     include/fixed_position_constraint.h
     include/static_force_generator.h
+    include/gravity_force_generator.h
+    include/link_constraint.h
+    include/gaussian_elimination_sle_solver.h
 )
 
 # GTEST
@@ -71,6 +77,7 @@ add_executable(simple-2d-constraint-solver-test
     test/euler_ode_solver_tests.cpp
     test/rk4_ode_solver_tests.cpp
     test/gauss_seidel_sle_solver_tests.cpp
+    test/gaussian_elimination_sle_solver_tests.cpp
 )
 
 target_link_libraries(simple-2d-constraint-solver-test

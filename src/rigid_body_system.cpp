@@ -16,6 +16,12 @@ void atg_scs::RigidBodySystem::initialize(SleSolver *sleSolver, OdeSolver *odeSo
     m_odeSolver = odeSolver;
 }
 
+void atg_scs::RigidBodySystem::reset() {
+    m_rigidBodies.clear();
+    m_constraints.clear();
+    m_forceGenerators.clear();
+}
+
 void atg_scs::RigidBodySystem::addRigidBody(RigidBody *body) {
     m_rigidBodies.push_back(body);
     body->index = (int)m_rigidBodies.size() - 1;
@@ -49,15 +55,13 @@ void atg_scs::RigidBodySystem::removeForceGenerator(ForceGenerator *forceGenerat
     m_forceGenerators.resize(m_forceGenerators.size() - 1);
 }
 
-void atg_scs::RigidBodySystem::process(double dt) {
+void atg_scs::RigidBodySystem::process(double dt, int steps) {
     const int n = getRigidBodyCount();
-    const int m_f = getFullConstraintCount();
     const int m = getConstraintCount();
 
     populateSystemState();
     populateMassMatrices();
 
-    const int steps = 1;
     for (int i = 0; i < steps; ++i) {
         m_odeSolver->start(&m_state, dt / steps);
 
@@ -124,6 +128,8 @@ void atg_scs::RigidBodySystem::populateSystemState() {
 
         m_state.v_theta[i] = m_rigidBodies[i]->v_theta;
         m_state.theta[i] = m_rigidBodies[i]->theta;
+
+        m_state.m[i] = m_rigidBodies[i]->m;
     }
 }
 
@@ -177,7 +183,7 @@ void atg_scs::RigidBodySystem::processConstraints() {
 
     Constraint::Output constraintOutput;
     int c_i = 0;
-    for (int j = 0;  j < m; ++j) {
+    for (int j = 0; j < m; ++j) {
         for (int i = 0; i < n; ++i) {
             m_constraints[j]->calculate(&constraintOutput, i, &m_state);
 
@@ -198,7 +204,7 @@ void atg_scs::RigidBodySystem::processConstraints() {
             }
         }
 
-        c_i += m_constraints[j]->m_constraintCount;
+        c_i += m_constraints[j]->getConstraintCount();
     }
 
     m_iv.J.multiply(m_iv.q_dot, &m_iv.reg0);

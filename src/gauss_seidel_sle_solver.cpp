@@ -5,7 +5,7 @@
 
 atg_scs::GaussSeidelSleSolver::GaussSeidelSleSolver() {
     m_maxIterations = 1000;
-    m_minDelta = 1E-15;
+    m_minDelta = 1E-10;
 }
 
 atg_scs::GaussSeidelSleSolver::~GaussSeidelSleSolver() {

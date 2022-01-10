@@ -1,13 +1,13 @@
 #include <gtest/gtest.h>
 
-#include "../include/gaussian_elimination_sle_solver.h"
+#include "../include/gauss_seidel_sle_solver.h"
 
-TEST(GaussianEliminationSleSolverTests, GaussianEliminationSleSolverSanity) {
-    atg_scs::GaussianEliminationSleSolver solver;
+TEST(GaussSeidelSleSolverTests, GaussSeidelSleSolverSanity) {
+    atg_scs::GaussSeidelSleSolver solver;
 }
 
-TEST(GaussianEliminationSleSolverTests, GaussSeidelSleSolverBasic) {
-    atg_scs::GaussianEliminationSleSolver solver;
+TEST(GaussSeidelSleSolverTests, GaussSeidelSleSolverBasic) {
+    atg_scs::GaussSeidelSleSolver solver;
 
     const double L_data[] = {
         500.0, 10.0,
@@ -38,8 +38,8 @@ TEST(GaussianEliminationSleSolverTests, GaussSeidelSleSolverBasic) {
     R.destroy();
 }
 
-TEST(GaussianEliminationSleSolverTests, GaussianEliminationSleSolver4x4) {
-    atg_scs::GaussianEliminationSleSolver solver;
+TEST(GaussSeidelSleSolverTests, GaussSeidelSleSolver4x4) {
+    atg_scs::GaussSeidelSleSolver solver;
 
     const double L_data[] = {
         500.0, 2.0, 3.0, 4.0,

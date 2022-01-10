@@ -24,6 +24,8 @@ namespace atg_scs {
         
             int getWidth() const { return m_width; }
             int getHeight() const { return m_height; }
+
+            void fastRowSwap(int a, int b);
         
         protected:
             double **m_matrix;

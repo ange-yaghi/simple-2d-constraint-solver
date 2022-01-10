@@ -21,6 +21,8 @@ atg_scs::SystemState::SystemState() {
     f_y = nullptr;
     t = nullptr;
 
+    m = nullptr;
+
     n = 0;
     dt = 0.0;
 }
@@ -50,6 +52,8 @@ void atg_scs::SystemState::copy(SystemState *state) {
     std::memcpy((void *)f_x, (void *)state->f_x, sizeof(double) * this->n);    
     std::memcpy((void *)f_y, (void *)state->f_y, sizeof(double) * this->n);    
     std::memcpy((void *)t, (void *)state->t, sizeof(double) * this->n);    
+
+    std::memcpy((void *)m, (void *)state->m, sizeof(double) * this->n);
 }
 
 void atg_scs::SystemState::resize(int bodyCount) {
@@ -75,6 +79,8 @@ void atg_scs::SystemState::resize(int bodyCount) {
     f_x = new double[n];
     f_y = new double[n];
     t = new double[n];
+
+    m = new double[n];
 }
 
 void atg_scs::SystemState::destroy() {
@@ -93,6 +99,8 @@ void atg_scs::SystemState::destroy() {
         freeArray(f_x);
         freeArray(f_y);
         freeArray(t);
+
+        freeArray(m);
     }
 
     n = 0;

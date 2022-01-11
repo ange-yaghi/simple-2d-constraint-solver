@@ -11,6 +11,7 @@
 
 #include "static_force_generator.h"
 #include "gravity_force_generator.h"
+#include "spring.h"
 
 #include "fixed_position_constraint.h"
 #include "link_constraint.h"

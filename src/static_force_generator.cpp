@@ -14,13 +14,13 @@ atg_scs::StaticForceGenerator::~StaticForceGenerator() {
 }
 
 void atg_scs::StaticForceGenerator::apply(SystemState *state) {
-    state->f_x[m_body->index] += m_f_x;
-    state->f_y[m_body->index] += m_f_y;
-
-    const double theta = state->theta[m_body->index];
-    state->t[m_body->index] +=
-        std::cos(theta) * m_p_x * m_f_x +
-        std::sin(theta) * m_p_y * m_f_y;
+    state->applyForce(
+        m_p_x,
+        m_p_y,
+        m_f_x,
+        m_f_y,
+        m_body->index
+    );
 }
 
 void atg_scs::StaticForceGenerator::setForce(double f_x, double f_y) {

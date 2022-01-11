@@ -7,6 +7,8 @@ namespace atg_scs {
             RigidBody();
             ~RigidBody();
 
+            void localToWorld(double x, double y, double *w_x, double *w_y);
+
             double p_x;
             double p_y;
 

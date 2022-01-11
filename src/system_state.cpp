@@ -4,6 +4,7 @@
 
 #include <assert.h>
 #include <cstring>
+#include <cmath>
 
 atg_scs::SystemState::SystemState() {
     a_theta = nullptr;
@@ -104,4 +105,58 @@ void atg_scs::SystemState::destroy() {
     }
 
     n = 0;
+}
+
+void atg_scs::SystemState::localToWorld(
+        double x,
+        double y,
+        double *x_t,
+        double *y_t,
+        int body)
+{
+    const double x0 = p_x[body];
+    const double y0 = p_y[body];
+    const double theta = this->theta[body];
+
+    const double cos_theta = std::cos(theta);
+    const double sin_theta = std::sin(theta);
+
+    *x_t = cos_theta * x - sin_theta * y + x0;
+    *y_t = sin_theta * x + cos_theta * y + y0;
+}
+
+void atg_scs::SystemState::velocityAtPoint(
+        double x,
+        double y,
+        double *v_x,
+        double *v_y,
+        int body)
+{
+    double w_x, w_y;
+    localToWorld(x, y, &w_x, &w_y, body);
+
+    const double v_theta = this->v_theta[body];
+    const double angularToLinear_x = -v_theta * (w_y - this->p_y[body]);
+    const double angularToLinear_y = v_theta * (w_x - this->p_x[body]);
+    
+    *v_x = this->v_x[body] + angularToLinear_x;
+    *v_y = this->v_y[body] + angularToLinear_y;
+}
+
+void atg_scs::SystemState::applyForce(
+    double x_l,
+    double y_l,
+    double f_x,
+    double f_y,
+    int body)
+{
+    double w_x, w_y;
+    localToWorld(x_l, y_l, &w_x, &w_y, body);
+
+    this->f_x[body] += f_x;
+    this->f_y[body] += f_y;
+
+    this->t[body] +=
+        (w_y - this->p_y[body]) * -f_x +
+        (w_x - this->p_x[body]) * f_y;
 }

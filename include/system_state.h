@@ -11,6 +11,10 @@ namespace atg_scs {
             void resize(int bodyCount);
             void destroy();
 
+            void localToWorld(double x, double y, double *x_t, double *y_t, int body);
+            void velocityAtPoint(double x, double y, double *v_x, double *v_y, int body);
+            void applyForce(double x_l, double y_l, double f_x, double f_y, int body);
+
             double *a_theta;
             double *v_theta;
             double *theta;

@@ -35,13 +35,23 @@ void atg_scs::Spring::apply(SystemState *state) {
 
     const double l = std::sqrt(dx * dx + dy * dy);
 
-    dx /= l;
-    dy /= l;
+    if (l != 0) {
+        dx /= l;
+        dy /= l;
+    }
+    else {
+        dx = 1.0;
+        dy = 0.0;
+    }
 
     const double rel_v_x = (v_x2 - v_x1);
     const double rel_v_y = (v_y2 - v_y1);
 
-    const double v = dx * rel_v_x + dy * rel_v_y;
+    double v = dx * rel_v_x + dy * rel_v_y;
+    v = std::fmin(
+        10.0,
+        std::fmax(-10.0, v)
+    );
 
     state->applyForce(
         m_p1_x,

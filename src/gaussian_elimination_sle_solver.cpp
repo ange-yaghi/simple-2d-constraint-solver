@@ -60,7 +60,9 @@ bool atg_scs::GaussianEliminationSleSolver::solve(
         }
     }
 
-    const double x_m = A.get(n - 1, m - 1) / A.get(n - 2, m - 1);
+    const double x_m = (A.get(n - 2, m - 1) == 0) 
+        ? 0.0
+        : A.get(n - 1, m - 1) / A.get(n - 2, m - 1);
     result->set(0, m - 1, x_m);
     for (int i = m - 2; i >= 0; --i) {
         const double b_i = A.get(n - 1, i);
@@ -69,7 +71,12 @@ bool atg_scs::GaussianEliminationSleSolver::solve(
             sum += A.get(j, i) * result->get(0, j);
         }
 
-        result->set(0, i, (b_i - sum) / A.get(i, i));
+        if (A.get(i, i) != 0) {
+            result->set(0, i, (b_i - sum) / A.get(i, i));
+        }
+        else {
+            result->set(0, i, 0);
+        }
     }
 
     for (int i = 0; i < m; ++i) {

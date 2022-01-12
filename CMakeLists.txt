@@ -47,6 +47,7 @@ add_library(simple-2d-constraint-solver STATIC
     src/link_constraint.cpp
     src/gaussian_elimination_sle_solver.cpp
     src/spring.cpp
+    src/line_constraint.cpp
 
     # Header files
     include/rigid_body_system.h
@@ -67,6 +68,7 @@ add_library(simple-2d-constraint-solver STATIC
     include/link_constraint.h
     include/gaussian_elimination_sle_solver.h
     include/spring.h
+    include/line_constraint.h
 )
 
 # GTEST

@@ -6,7 +6,7 @@ atg_scs::LinkConstraint::LinkConstraint() : Constraint(2, 2) {
     m_local_x_1 = m_local_y_1 = 0.0;
     m_local_x_2 = m_local_y_2 = 0.0;
     m_ks = 10.0;
-    m_kd = 10.0;
+    m_kd = 1.0;
 }
 
 atg_scs::LinkConstraint::~LinkConstraint() {

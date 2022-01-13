@@ -48,6 +48,7 @@ add_library(simple-2d-constraint-solver STATIC
     src/gaussian_elimination_sle_solver.cpp
     src/spring.cpp
     src/line_constraint.cpp
+    src/constant_speed_motor.cpp
 
     # Header files
     include/rigid_body_system.h
@@ -69,6 +70,7 @@ add_library(simple-2d-constraint-solver STATIC
     include/gaussian_elimination_sle_solver.h
     include/spring.h
     include/line_constraint.h
+    include/constant_speed_motor.h
 )
 
 # GTEST

@@ -12,6 +12,7 @@
 #include "static_force_generator.h"
 #include "gravity_force_generator.h"
 #include "spring.h"
+#include "constant_speed_motor.h"
 
 #include "fixed_position_constraint.h"
 #include "link_constraint.h"

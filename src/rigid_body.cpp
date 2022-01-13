@@ -3,7 +3,7 @@
 #include <cmath>
 
 atg_scs::RigidBody::RigidBody() {
-    index = 0;
+    index = -1;
     reset();
 }
 

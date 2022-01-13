@@ -120,12 +120,16 @@ void atg_scs::RigidBodySystem::populateSystemState() {
     m_state.resize(n);
 
     for (int i = 0; i < n; ++i) {
+        m_state.a_x[i] = 0;
+        m_state.a_y[i] = 0;
+
         m_state.v_x[i] = m_rigidBodies[i]->v_x;
         m_state.v_y[i] = m_rigidBodies[i]->v_y;
 
         m_state.p_x[i] = m_rigidBodies[i]->p_x;
         m_state.p_y[i] = m_rigidBodies[i]->p_y;
 
+        m_state.a_theta[i] = 0;
         m_state.v_theta[i] = m_rigidBodies[i]->v_theta;
         m_state.theta[i] = m_rigidBodies[i]->theta;
 

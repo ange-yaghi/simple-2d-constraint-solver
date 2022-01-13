@@ -14,6 +14,9 @@
 namespace atg_scs {
     class RigidBodySystem {
         public:
+            static const int ProfilingSamples = 100;
+
+        public:
             RigidBodySystem();
             ~RigidBodySystem();
 
@@ -37,11 +40,18 @@ namespace atg_scs {
 
             int getFullConstraintCount() const;
 
+            float getOdeSolveMicroseconds() const;
+            float getConstraintSolveMicroseconds() const;
+            float getForceEvalMicroseconds() const;
+            float getConstraintEvalMicroseconds() const;
+
         protected:
+            static float findAverage(int *samplse);
+
             void populateSystemState();
             void populateMassMatrices();
             void processForces();
-            void processConstraints();
+            void processConstraints(int *evalTime, int *solveTime);
 
         protected:
             std::vector<RigidBody *> m_rigidBodies;
@@ -52,6 +62,12 @@ namespace atg_scs {
             OdeSolver *m_odeSolver;
 
             SystemState m_state;
+
+            int *m_odeSolveMicroseconds;
+            int *m_constraintSolveMicroseconds;
+            int *m_forceEvalMicroseconds;
+            int *m_constraintEvalMicroseconds;
+            int m_frameIndex;
 
         protected:
             struct IntermediateValues {

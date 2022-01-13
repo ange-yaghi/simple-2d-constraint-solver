@@ -1,14 +1,31 @@
 #include "../include/rigid_body_system.h"
 
 #include <assert.h>
+#include <chrono>
 
 atg_scs::RigidBodySystem::RigidBodySystem() {
     m_sleSolver = nullptr;
     m_odeSolver = nullptr;
+
+    m_odeSolveMicroseconds = new int[ProfilingSamples];
+    m_constraintSolveMicroseconds = new int[ProfilingSamples];
+    m_forceEvalMicroseconds = new int[ProfilingSamples];
+    m_constraintEvalMicroseconds = new int[ProfilingSamples];
+    m_frameIndex = 0;
+
+    for (int i = 0; i < ProfilingSamples; ++i) {
+        m_odeSolveMicroseconds[i] = -1;
+        m_constraintSolveMicroseconds[i] = -1;
+        m_forceEvalMicroseconds[i] = -1;
+        m_constraintEvalMicroseconds[i] = -1;
+    }
 }
 
 atg_scs::RigidBodySystem::~RigidBodySystem() {
-    /* void */
+    delete[] m_odeSolveMicroseconds;
+    delete[] m_constraintSolveMicroseconds;
+    delete[] m_forceEvalMicroseconds;
+    delete[] m_constraintEvalMicroseconds;
 }
 
 void atg_scs::RigidBodySystem::initialize(SleSolver *sleSolver, OdeSolver *odeSolver) {
@@ -59,6 +76,12 @@ void atg_scs::RigidBodySystem::process(double dt, int steps) {
     const int n = getRigidBodyCount();
     const int m = getConstraintCount();
 
+    int
+        odeSolveTime = 0,
+        constraintSolveTime = 0,
+        forceEvalTime = 0,
+        constraintEvalTime = 0;
+
     populateSystemState();
     populateMassMatrices();
 
@@ -68,10 +91,24 @@ void atg_scs::RigidBodySystem::process(double dt, int steps) {
         while (true) {
             const bool done = m_odeSolver->step(&m_state);
 
-            processForces();
-            processConstraints();
+            int evalTime, solveTime;
 
+            auto s0 = std::chrono::steady_clock::now();
+            processForces();
+            auto s1 = std::chrono::steady_clock::now();
+
+            processConstraints(&evalTime, &solveTime);
+
+            auto s2 = std::chrono::steady_clock::now();
             m_odeSolver->solve(&m_state);
+            auto s3 = std::chrono::steady_clock::now();
+
+            constraintSolveTime += solveTime;
+            constraintEvalTime += evalTime;
+            odeSolveTime +=
+                std::chrono::duration_cast<std::chrono::microseconds>(s3 - s2).count();
+            forceEvalTime +=
+                std::chrono::duration_cast<std::chrono::microseconds>(s1 - s0).count();
 
             if (done) break;
         }
@@ -103,6 +140,12 @@ void atg_scs::RigidBodySystem::process(double dt, int steps) {
             }
         }
     }
+
+    m_odeSolveMicroseconds[m_frameIndex] = odeSolveTime;
+    m_constraintSolveMicroseconds[m_frameIndex] = constraintSolveTime;
+    m_forceEvalMicroseconds[m_frameIndex] = forceEvalTime;
+    m_constraintEvalMicroseconds[m_frameIndex] = constraintEvalTime;
+    m_frameIndex = (m_frameIndex + 1) % ProfilingSamples;
 }
 
 int atg_scs::RigidBodySystem::getFullConstraintCount() const {
@@ -112,6 +155,36 @@ int atg_scs::RigidBodySystem::getFullConstraintCount() const {
     }
 
     return count;
+}
+
+float atg_scs::RigidBodySystem::findAverage(int *samples) {
+    int accum = 0;
+    int count = 0;
+    for (int i = 0; i < ProfilingSamples; ++i) {
+        if (samples[i] != -1) {
+            accum += samples[i];
+            ++count;
+        }
+    }
+
+    if (count == 0) return 0;
+    else return (float)accum / count;
+}
+
+float atg_scs::RigidBodySystem::getOdeSolveMicroseconds() const {
+    return findAverage(m_odeSolveMicroseconds);
+}
+
+float atg_scs::RigidBodySystem::getConstraintSolveMicroseconds() const {
+    return findAverage(m_constraintSolveMicroseconds);
+}
+
+float atg_scs::RigidBodySystem::getConstraintEvalMicroseconds() const {
+    return findAverage(m_constraintEvalMicroseconds);
+}
+
+float atg_scs::RigidBodySystem::getForceEvalMicroseconds() const {
+    return findAverage(m_forceEvalMicroseconds);
 }
 
 void atg_scs::RigidBodySystem::populateSystemState() {
@@ -168,7 +241,15 @@ void atg_scs::RigidBodySystem::processForces() {
     }
 }
 
-void atg_scs::RigidBodySystem::processConstraints() {
+void atg_scs::RigidBodySystem::processConstraints(
+        int *evalTime,
+        int *solveTime)
+{
+    *evalTime = -1;
+    *solveTime = -1;
+
+    auto s0 = std::chrono::steady_clock::now();
+
     const int n = getRigidBodyCount();
     const int m_f = getFullConstraintCount();
     const int m = getConstraintCount();
@@ -238,9 +319,13 @@ void atg_scs::RigidBodySystem::processConstraints() {
     m_iv.reg2.subtract(m_iv.C_ks, &m_iv.reg1);
     m_iv.reg1.subtract(m_iv.C_kd, &m_iv.right);
 
+    auto s1 = std::chrono::steady_clock::now();
+
     const bool solvable =
         m_sleSolver->solve(m_iv.left, m_iv.right, &m_iv.lambda, &m_iv.lambda);
     assert(solvable);
+
+    auto s2 = std::chrono::steady_clock::now();
 
     m_iv.J_T.multiply(m_iv.lambda, &m_iv.F_C);
 
@@ -262,4 +347,11 @@ void atg_scs::RigidBodySystem::processConstraints() {
         m_state.a_theta[i] =
             invInertia * (m_iv.F_C.get(0, i * 3 + 2) + m_iv.F_ext.get(0, i * 3 + 2));
     }
+
+    auto s3 = std::chrono::steady_clock::now();
+
+    *evalTime =
+        std::chrono::duration_cast<std::chrono::microseconds>(s1 - s0 + s3 - s2).count();
+    *solveTime =
+        std::chrono::duration_cast<std::chrono::microseconds>(s2 - s1).count();
 }

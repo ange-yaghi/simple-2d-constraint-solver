@@ -14,7 +14,7 @@
 namespace atg_scs {
     class RigidBodySystem {
         public:
-            static const int ProfilingSamples = 100;
+            static const int ProfilingSamples = 60 * 10;
 
         public:
             RigidBodySystem();

@@ -91,7 +91,7 @@ void atg_scs::RigidBodySystem::process(double dt, int steps) {
         while (true) {
             const bool done = m_odeSolver->step(&m_state);
 
-            int evalTime, solveTime;
+            int evalTime = 0, solveTime = 0;
 
             auto s0 = std::chrono::steady_clock::now();
             processForces();
@@ -215,6 +215,7 @@ void atg_scs::RigidBodySystem::populateMassMatrices() {
 
     m_iv.M.initialize(3 * n, 3 * n);
     m_iv.M_inv.initialize(3 * n, 3 * n);
+
     for (int i = 0; i < n; ++i) {
         m_iv.M.set(i * 3 + 0, i * 3 + 0, m_rigidBodies[i]->m);
         m_iv.M.set(i * 3 + 1, i * 3 + 1, m_rigidBodies[i]->m);
@@ -340,12 +341,22 @@ void atg_scs::RigidBodySystem::processConstraints(
         const double invMass = m_iv.M_inv.get(i * 3 + 0, i * 3 + 0);
         const double invInertia = m_iv.M_inv.get(i * 3 + 2, i * 3 + 2);
 
+        const double F_C_x = (m_f > 0)
+            ? m_iv.F_C.get(0, i * 3 + 0)
+            : 0;
+        const double F_C_y = (m_f > 0)
+            ? m_iv.F_C.get(0, i * 3 + 1)
+            : 0;
+        const double F_C_t = (m_f > 0)
+            ? m_iv.F_C.get(0, i * 3 + 2)
+            : 0;
+
         m_state.a_x[i] =
-            invMass * (m_iv.F_C.get(0, i * 3 + 0) + m_iv.F_ext.get(0, i * 3 + 0));
+            invMass * (F_C_x + m_iv.F_ext.get(0, i * 3 + 0));
         m_state.a_y[i] =
-            invMass * (m_iv.F_C.get(0, i * 3 + 1) + m_iv.F_ext.get(0, i * 3 + 1));
+            invMass * (F_C_y + m_iv.F_ext.get(0, i * 3 + 1));
         m_state.a_theta[i] =
-            invInertia * (m_iv.F_C.get(0, i * 3 + 2) + m_iv.F_ext.get(0, i * 3 + 2));
+            invInertia * (F_C_t + m_iv.F_ext.get(0, i * 3 + 2));
     }
 
     auto s3 = std::chrono::steady_clock::now();

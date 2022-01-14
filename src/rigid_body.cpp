@@ -33,6 +33,19 @@ void atg_scs::RigidBody::localToWorld(
     *w_y = sin_theta * x + cos_theta * y + p_y;
 }
 
+void atg_scs::RigidBody::worldToLocal(
+        double x,
+        double y,
+        double *l_x,
+        double *l_y)
+{
+    const double cos_theta = std::cos(theta);
+    const double sin_theta = std::sin(theta);
+
+    *l_x = cos_theta * x + sin_theta * y - p_x;
+    *l_y = -sin_theta * x + cos_theta * y - p_y;
+}
+
 void atg_scs::RigidBody::reset() {
     p_x = p_y = 0.0;
     v_x = v_y = 0.0;

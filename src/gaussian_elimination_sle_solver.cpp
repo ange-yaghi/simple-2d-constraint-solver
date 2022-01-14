@@ -20,6 +20,8 @@ bool atg_scs::GaussianEliminationSleSolver::solve(
     const int n = left.getWidth() + 1;
     const int m = left.getHeight();
 
+    if (n == 0 || m == 0) return true;
+
     result->resize(1, m);
 
     Matrix A(n, m);

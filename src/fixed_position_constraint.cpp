@@ -13,6 +13,16 @@ atg_scs::FixedPositionConstraint::~FixedPositionConstraint() {
     /* void */
 }
 
+void atg_scs::FixedPositionConstraint::setWorldPosition(double x, double y) {
+    m_world_x = x;
+    m_world_y = y;
+}
+
+void atg_scs::FixedPositionConstraint::setLocalPosition(double x, double y) {
+    m_local_x = x;
+    m_local_y = y;
+}
+
 void atg_scs::FixedPositionConstraint::calculate(
         Output *output,
         int body,

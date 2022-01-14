@@ -6,12 +6,14 @@ atg_scs::Matrix::Matrix() {
     m_matrix = nullptr;
     m_data = nullptr;
     m_width = m_height = 0;
+    m_capacityWidth = m_capacityHeight = 0;
 }
 
 atg_scs::Matrix::Matrix(int width, int height, double value) {
     m_matrix = nullptr;
     m_data = nullptr;
     m_width = m_height = 0;
+    m_capacityWidth = m_capacityHeight = 0;
 
     initialize(width, height, value);
 }
@@ -70,6 +72,9 @@ void atg_scs::Matrix::destroy() {
 }
 
 void atg_scs::Matrix::set(int column, int row, double value) {
+    assert(column >= 0 && column < m_width);
+    assert(row >= 0 && row < m_height);
+
     m_matrix[row][column] = value;
 }
 
@@ -80,6 +85,9 @@ void atg_scs::Matrix::set(const double *data) {
 }
 
 double atg_scs::Matrix::get(int column, int row) {
+    assert(column >= 0 && column < m_width);
+    assert(row >= 0 && row < m_height);
+
     return m_matrix[row][column];
 }
 
@@ -112,7 +120,7 @@ void atg_scs::Matrix::multiply(Matrix &b, Matrix *target) {
 
 void atg_scs::Matrix::subtract(Matrix &b, Matrix *target) {
     assert(b.m_width == m_width);
-    assert(b.m_height = m_height);
+    assert(b.m_height == m_height);
 
     target->resize(m_width, m_height);
 

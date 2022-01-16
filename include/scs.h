@@ -17,5 +17,6 @@
 #include "fixed_position_constraint.h"
 #include "link_constraint.h"
 #include "line_constraint.h"
+#include "rolling_constraint.h"
 
 #endif /* ATG_SIMPLE_2D_CONSTRAINT_SOLVER_SCS_H */

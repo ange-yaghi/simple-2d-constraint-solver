@@ -50,6 +50,11 @@ void atg_scs::RigidBodySystem::removeRigidBody(RigidBody *body) {
     m_rigidBodies.resize(m_rigidBodies.size() - 1);
 }
 
+atg_scs::RigidBody *atg_scs::RigidBodySystem::getRigidBody(int i) {
+    assert(i < m_rigidBodies.size());
+    return m_rigidBodies[i]; 
+}
+
 void atg_scs::RigidBodySystem::addConstraint(Constraint *constraint) {
     m_constraints.push_back(constraint);
     constraint->m_index = (int)m_constraints.size() - 1;

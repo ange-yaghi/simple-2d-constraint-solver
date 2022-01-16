@@ -49,6 +49,7 @@ add_library(simple-2d-constraint-solver STATIC
     src/spring.cpp
     src/line_constraint.cpp
     src/constant_speed_motor.cpp
+    src/rolling_constraint.cpp
 
     # Header files
     include/rigid_body_system.h
@@ -71,6 +72,7 @@ add_library(simple-2d-constraint-solver STATIC
     include/spring.h
     include/line_constraint.h
     include/constant_speed_motor.h
+    include/rolling_constraint.h
 )
 
 # GTEST

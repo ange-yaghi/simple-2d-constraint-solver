@@ -37,7 +37,9 @@ void atg_scs::ConstantSpeedMotor::apply(SystemState *state) {
     const double torque = delta * m_ks;
     const double dampingTorque = -rel_a * m_kd;
     const double totalTorque = torque + dampingTorque;
+    const double limitedTorque =
+        std::fmin(m_maxTorque, std::fmax(-m_maxTorque, totalTorque));
 
-    if (m_body0->index != -1) state->t[m_body0->index] -= totalTorque;
-    state->t[m_body1->index] += totalTorque;
+    if (m_body0->index != -1) state->t[m_body0->index] -= limitedTorque;
+    state->t[m_body1->index] += limitedTorque;
 }

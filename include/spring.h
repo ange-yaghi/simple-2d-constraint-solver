@@ -14,6 +14,7 @@ namespace atg_scs {
             virtual void apply(SystemState *state);
             
             void getEnds(double *x_1, double *y_1, double *x_2, double *y_2);
+            double energy() const;
 
             double m_restLength;
             double m_ks;

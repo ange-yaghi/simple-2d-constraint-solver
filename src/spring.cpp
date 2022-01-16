@@ -70,8 +70,31 @@ void atg_scs::Spring::apply(SystemState *state) {
     );
 }
 
-
 void atg_scs::Spring::getEnds(double *x_1, double *y_1, double *x_2, double *y_2) {
     m_body1->localToWorld(m_p1_x, m_p1_y, x_1, y_1);
     m_body2->localToWorld(m_p2_x, m_p2_y, x_2, y_2);
+}
+
+double atg_scs::Spring::energy() const {
+    double x1, y1;
+    double x2, y2;
+
+    m_body1->localToWorld(m_p1_x, m_p1_y, &x1, &y1);
+    m_body2->localToWorld(m_p2_x, m_p2_y, &x2, &y2);
+
+    double dx = x2 - x1;
+    double dy = y2 - y1;
+
+    const double l = std::sqrt(dx * dx + dy * dy);
+
+    if (l != 0) {
+        dx /= l;
+        dy /= l;
+    }
+    else {
+        dx = 1.0;
+        dy = 0.0;
+    }
+
+    return 0.5 * m_ks * (l - m_restLength) * (l - m_restLength);
 }

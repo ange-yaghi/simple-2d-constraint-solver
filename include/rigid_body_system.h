@@ -25,6 +25,7 @@ namespace atg_scs {
 
             void addRigidBody(RigidBody *body);
             void removeRigidBody(RigidBody *body);
+            RigidBody *getRigidBody(int i);
 
             void addConstraint(Constraint *constraint);
             void removeConstraint(Constraint *constraint);

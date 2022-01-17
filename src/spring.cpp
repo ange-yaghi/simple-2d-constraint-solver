@@ -3,7 +3,7 @@
 #include <cmath>
 
 atg_scs::Spring::Spring() {
-    m_restLength = 0;
+    m_restLength = 1.0;
     m_ks = 0;
     m_kd = 0;
 
@@ -21,14 +21,24 @@ void atg_scs::Spring::apply(SystemState *state) {
     double x1, y1;
     double x2, y2;
 
-    double v_x1, v_y1;
-    double v_x2, v_y2;
+    double v_x1 = 0, v_y1 = 0;
+    double v_x2 = 0, v_y2 = 0;
 
-    state->localToWorld(m_p1_x, m_p1_y, &x1, &y1, m_body1->index);
-    state->localToWorld(m_p2_x, m_p2_y, &x2, &y2, m_body2->index);
+    if (m_body1->index != -1) {
+        state->localToWorld(m_p1_x, m_p1_y, &x1, &y1, m_body1->index);
+        state->velocityAtPoint(m_p1_x, m_p1_y, &v_x1, &v_y1, m_body1->index);
+    }
+    else {
+        m_body1->localToWorld(m_p1_x, m_p1_y, &x1, &y1);
+    }
 
-    state->velocityAtPoint(m_p1_x, m_p1_y, &v_x1, &v_y1, m_body1->index);
-    state->velocityAtPoint(m_p2_x, m_p2_y, &v_x2, &v_y2, m_body2->index);
+    if (m_body2->index != 1) {
+        state->localToWorld(m_p2_x, m_p2_y, &x2, &y2, m_body2->index);
+        state->velocityAtPoint(m_p2_x, m_p2_y, &v_x2, &v_y2, m_body2->index);
+    }
+    else {
+        m_body2->localToWorld(m_p2_x, m_p2_y, &x2, &y2);
+    }
     
     double dx = x2 - x1;
     double dy = y2 - y1;

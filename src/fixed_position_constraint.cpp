@@ -25,15 +25,9 @@ void atg_scs::FixedPositionConstraint::setLocalPosition(double x, double y) {
 
 void atg_scs::FixedPositionConstraint::calculate(
         Output *output,
-        int body,
         SystemState *state)
 {
-    if (body != m_bodies[0]->index) {
-        output->n = 0;
-        return;
-    }
-
-    output->n = 2;
+    const int body = m_bodies[0]->index;
 
     const double q1 = state->p_x[body];
     const double q2 = state->p_y[body];
@@ -53,12 +47,7 @@ void atg_scs::FixedPositionConstraint::calculate(
     const double dy_dq2 = 1.0;
     const double dy_dq3 = cos_q3 * m_local_x - sin_q3 * m_local_y;
 
-    const double d2x_dq1_2 = 0.0;
-    const double d2x_dq2_2 = 0.0;
     const double d2x_dq3_2 = -cos_q3 * m_local_x + sin_q3 * m_local_y;
-
-    const double d2y_dq1_2 = 0.0;
-    const double d2y_dq2_2 = 0.0;
     const double d2y_dq3_2 = -sin_q3 * m_local_x - cos_q3 * m_local_y;
 
     const double C1 = current_x - m_world_x;
@@ -72,13 +61,32 @@ void atg_scs::FixedPositionConstraint::calculate(
     output->dC_dq[1][1] = dy_dq2;
     output->dC_dq[1][2] = dy_dq3;
 
-    output->d2C_dq2[0][0] = d2x_dq1_2;
-    output->d2C_dq2[0][1] = d2x_dq2_2;
-    output->d2C_dq2[0][2] = d2x_dq3_2;
+    // d/dq1
+    output->d2C_dq2[0][0][0] = 0;
+    output->d2C_dq2[0][0][1] = 0;
+    output->d2C_dq2[0][0][2] = 0;
 
-    output->d2C_dq2[1][0] = d2y_dq1_2;
-    output->d2C_dq2[1][1] = d2y_dq2_2;
-    output->d2C_dq2[1][2] = d2y_dq3_2;
+    output->d2C_dq2[0][1][0] = 0;
+    output->d2C_dq2[0][1][1] = 0;
+    output->d2C_dq2[0][1][2] = 0;
+
+    // d/dq2
+    output->d2C_dq2[1][0][0] = 0;
+    output->d2C_dq2[1][0][1] = 0;
+    output->d2C_dq2[1][0][2] = 0;
+
+    output->d2C_dq2[1][1][0] = 0;
+    output->d2C_dq2[1][1][1] = 0;
+    output->d2C_dq2[1][1][2] = 0;
+
+    // d/dq3
+    output->d2C_dq2[2][0][0] = 0;
+    output->d2C_dq2[2][0][1] = 0;
+    output->d2C_dq2[2][0][2] = d2x_dq3_2;
+
+    output->d2C_dq2[2][1][0] = 0;
+    output->d2C_dq2[2][1][1] = 0;
+    output->d2C_dq2[2][1][2] = d2y_dq3_2;
 
     output->ks[0] = m_ks * C1;
     output->ks[1] = m_ks * C2;

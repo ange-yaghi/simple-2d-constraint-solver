@@ -11,6 +11,6 @@ atg_scs::Constraint::~Constraint() {
     /* void */
 }
 
-void atg_scs::Constraint::calculate(Output *output, int body, SystemState *state) {
-    output->n = 0;
+void atg_scs::Constraint::calculate(Output *output, SystemState *state) {
+    /* void */
 }

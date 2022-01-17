@@ -11,7 +11,7 @@ namespace atg_scs {
             
             void setBody(RigidBody *body) { m_bodies[0] = body; }
 
-            virtual void calculate(Output *output, int body, SystemState *system);
+            virtual void calculate(Output *output, SystemState *system);
 
             double m_local_x;
             double m_local_y;

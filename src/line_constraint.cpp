@@ -16,15 +16,9 @@ atg_scs::LineConstraint::~LineConstraint() {
 
 void atg_scs::LineConstraint::calculate(
         Output *output,
-        int body,
         SystemState *state)
 {
-    if (body != m_bodies[0]->index) {
-        output->n = 0;
-        return;
-    }
-
-    output->n = 1;
+    const int body = m_bodies[0]->index;
 
     const double q1 = state->p_x[body];
     const double q2 = state->p_y[body];
@@ -50,8 +44,6 @@ void atg_scs::LineConstraint::calculate(
         (-sin_q3 * m_local_x - cos_q3 * m_local_y) * perpX +
         (cos_q3 * m_local_x - sin_q3 * m_local_y) * perpY;
 
-    const double d2C_dq1_2 = 0.0;
-    const double d2C_dq2_2 = 0.0;
     const double d2C_dq3_2 =
         (-cos_q3 * m_local_x + sin_q3 * m_local_y) * perpX +
         (-sin_q3 * m_local_x - cos_q3 * m_local_y) * perpY;
@@ -60,10 +52,21 @@ void atg_scs::LineConstraint::calculate(
     output->dC_dq[0][1] = dC_dq2;
     output->dC_dq[0][2] = dC_dq3;
 
-    output->d2C_dq2[0][0] = d2C_dq1_2;
-    output->d2C_dq2[0][1] = d2C_dq2_2;
-    output->d2C_dq2[0][2] = d2C_dq3_2;
+    // d/dq1
+    output->d2C_dq2[0][0][0] = 0;
+    output->d2C_dq2[0][0][1] = 0;
+    output->d2C_dq2[0][0][2] = 0;
 
+    // d/dq2
+    output->d2C_dq2[1][0][0] = 0;
+    output->d2C_dq2[1][0][1] = 0;
+    output->d2C_dq2[1][0][2] = 0;
+
+    // d/dq3
+    output->d2C_dq2[2][0][0] = 0;
+    output->d2C_dq2[2][0][1] = 0;
+    output->d2C_dq2[2][0][2] = d2C_dq3_2;
+     
     output->ks[0] = m_ks * C;
     output->kd[0] = m_kd;
 }

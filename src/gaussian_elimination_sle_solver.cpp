@@ -62,6 +62,10 @@ bool atg_scs::GaussianEliminationSleSolver::solve(
         }
     }
 
+    if (A.get(n - 2, m - 1) == 0) {
+        assert(false);
+    }
+
     const double x_m = (A.get(n - 2, m - 1) == 0) 
         ? 0.0
         : A.get(n - 1, m - 1) / A.get(n - 2, m - 1);

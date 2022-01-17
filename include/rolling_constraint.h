@@ -8,11 +8,11 @@ namespace atg_scs {
         public:
             RollingConstraint();
             virtual ~RollingConstraint();
-            
+
             void setBaseBody(RigidBody *body) { m_bodies[0] = body; }
             void setRollingBody(RigidBody *body) { m_bodies[1] = body; }
 
-            virtual void calculate(Output *output, int body, SystemState *system);
+            virtual void calculate(Output *output, SystemState *system);
 
             double m_local_x;
             double m_local_y;

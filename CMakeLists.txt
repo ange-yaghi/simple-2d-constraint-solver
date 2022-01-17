@@ -86,6 +86,7 @@ add_executable(simple-2d-constraint-solver-test
     test/rk4_ode_solver_tests.cpp
     test/gauss_seidel_sle_solver_tests.cpp
     test/gaussian_elimination_sle_solver_tests.cpp
+    test/rolling_constraint_tests.cpp
 )
 
 target_link_libraries(simple-2d-constraint-solver-test

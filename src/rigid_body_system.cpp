@@ -52,7 +52,7 @@ void atg_scs::RigidBodySystem::removeRigidBody(RigidBody *body) {
 
 atg_scs::RigidBody *atg_scs::RigidBodySystem::getRigidBody(int i) {
     assert(i < m_rigidBodies.size());
-    return m_rigidBodies[i]; 
+    return m_rigidBodies[i];
 }
 
 void atg_scs::RigidBodySystem::addConstraint(Constraint *constraint) {
@@ -275,20 +275,33 @@ void atg_scs::RigidBodySystem::processConstraints(
     Constraint::Output constraintOutput;
     int c_i = 0;
     for (int j = 0; j < m; ++j) {
-        for (int i = 0; i < n; ++i) {
-            m_constraints[j]->calculate(&constraintOutput, i, &m_state);
+        m_constraints[j]->calculate(&constraintOutput, &m_state);
 
-            for (int k = 0; k < constraintOutput.n; ++k) {
-                m_iv.J.set(i * 3 + 0, c_i + k, constraintOutput.dC_dq[k][0]);
-                m_iv.J.set(i * 3 + 1, c_i + k, constraintOutput.dC_dq[k][1]);
-                m_iv.J.set(i * 3 + 2, c_i + k, constraintOutput.dC_dq[k][2]);
+        for (int k = 0; k < m_constraints[j]->m_constraintCount; ++k) {
+            for (int i = 0; i < m_constraints[j]->m_bodyCount * 3; ++i) {
+                const int index = m_constraints[j]->m_bodies[i / 3]->index;
 
-                m_iv.J_dot.set(i * 3 + 0, c_i + k,
-                    constraintOutput.d2C_dq2[k][0] * m_state.v_x[i]);
-                m_iv.J_dot.set(i * 3 + 1, c_i + k,
-                    constraintOutput.d2C_dq2[k][1] * m_state.v_y[i]);
-                m_iv.J_dot.set(i * 3 + 2, c_i + k,
-                    constraintOutput.d2C_dq2[k][2] * m_state.v_theta[i]);
+                m_iv.J.set(index * 3 + (i % 3), c_i + k,
+                        constraintOutput.dC_dq[k][i]);
+
+                //m_iv.J_dot.set(i * 3 + 0, c_i + k,
+                //    constraintOutput.d2C_dq2[k][0] * m_state.v_x[i]);
+                //m_iv.J_dot.set(i * 3 + 1, c_i + k,
+                //    constraintOutput.d2C_dq2[k][1] * m_state.v_y[i]);
+                //m_iv.J_dot.set(i * 3 + 2, c_i + k,
+                //    constraintOutput.d2C_dq2[k][2] * m_state.v_theta[i]);
+
+                double j_dot = 0;
+                for (int i_q = 0; i_q < m_constraints[j]->m_bodyCount * 3; ++i_q) {
+                    const int b = m_constraints[j]->m_bodies[i_q / 3]->index;
+
+                    double *all_qdot[] = { m_state.v_x, m_state.v_y, m_state.v_theta };
+                    double *q_dot = all_qdot[i_q % 3];
+
+                    j_dot += constraintOutput.d2C_dq2[i][k][i_q] * q_dot[b];
+                }
+
+                m_iv.J_dot.set(index * 3 + (i % 3), c_i + k, j_dot);
 
                 m_iv.C_ks.set(0, c_i + k, constraintOutput.ks[k]);
                 m_iv.C_kd.set(0, c_i + k, constraintOutput.kd[k]);

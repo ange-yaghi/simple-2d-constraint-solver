@@ -11,18 +11,18 @@ namespace atg_scs {
             static constexpr int MaxBodyCount = 2;
 
             struct Output {
-                double dC_dq[MaxConstraintCount][3];
-                double d2C_dq2[MaxConstraintCount][3];
+                double dC_dq[MaxConstraintCount][3 * MaxBodyCount];
+                double d2C_dq2[3 * MaxBodyCount][MaxConstraintCount][3 * MaxBodyCount];
                 double ks[MaxConstraintCount];
                 double kd[MaxConstraintCount];
-                int n;
+                double C[MaxConstraintCount];
             };
 
         public:
             Constraint(int constraintCount, int bodyCount);
             virtual ~Constraint();
             
-            virtual void calculate(Output *output, int body, SystemState *state);
+            virtual void calculate(Output *output, SystemState *state);
 
             int getConstraintCount() const { return m_constraintCount; }
 

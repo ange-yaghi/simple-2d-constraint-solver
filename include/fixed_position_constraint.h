@@ -14,7 +14,7 @@ namespace atg_scs {
             void setWorldPosition(double x, double y);
             void setLocalPosition(double x, double y);
 
-            virtual void calculate(Output *output, int body, SystemState *system);
+            virtual void calculate(Output *output, SystemState *system);
 
             double m_local_x;
             double m_local_y;

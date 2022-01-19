@@ -14,6 +14,9 @@ namespace atg_scs {
                     Matrix &right,
                     Matrix *result,
                     Matrix *previous);
+
+        protected:
+            Matrix m_a;
     };
 } /* namespace atg_scs */
 

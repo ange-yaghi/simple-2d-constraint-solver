@@ -69,6 +69,7 @@ void atg_scs::Matrix::destroy() {
     m_data = nullptr;
 
     m_width = m_height = 0;
+    m_capacityWidth = m_capacityHeight = 0;
 }
 
 void atg_scs::Matrix::set(int column, int row, double value) {

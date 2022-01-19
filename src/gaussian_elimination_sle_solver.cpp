@@ -2,13 +2,14 @@
 
 #include <cmath>
 #include <assert.h>
+#include <fstream>
 
 atg_scs::GaussianEliminationSleSolver::GaussianEliminationSleSolver() {
-    /* void */
+    m_a.initialize(1, 1);
 }
 
 atg_scs::GaussianEliminationSleSolver::~GaussianEliminationSleSolver() {
-    /* void */
+    m_a.destroy();
 }
 
 bool atg_scs::GaussianEliminationSleSolver::solve(
@@ -24,7 +25,8 @@ bool atg_scs::GaussianEliminationSleSolver::solve(
 
     result->resize(1, m);
 
-    Matrix A(n, m);
+    Matrix &A = m_a;
+    A.resize(n, m);
 
     for (int i = 0; i < m; ++i) {
         A.set(n - 1, i, right.get(0, i));
@@ -37,7 +39,7 @@ bool atg_scs::GaussianEliminationSleSolver::solve(
     while (h < m && k < n) {
         int i_max = h;
         for (int i = h + 1; i < m; ++i) {
-            if (A.get(k, i) > A.get(k, i_max)) {
+            if (std::abs(A.get(k, i)) > std::abs(A.get(k, i_max))) {
                 i_max = i;
             }
         }
@@ -63,12 +65,39 @@ bool atg_scs::GaussianEliminationSleSolver::solve(
     }
 
     if (A.get(n - 2, m - 1) == 0) {
+        std::fstream f("bad_matrix.csv", std::ios::out);
+        for (int i = 0; i < left.getHeight(); ++i) {
+            for (int j = 0; j < left.getWidth(); ++j) {
+                f << left.get(j, i);
+                if (j < left.getWidth() - 1) f << ",";
+                else f << "\n";
+            }
+        }
+
+        f.close();
+        f.open("rref.csv", std::ios::out);
+        for (int i = 0; i < A.getHeight(); ++i) {
+            for (int j = 0; j < A.getWidth(); ++j) {
+                f << A.get(j, i);
+                if (j < A.getWidth() - 1) f << ",";
+                else f << "\n";
+            }
+        }
+
+        f.close();
+        f.open("bad_vector.csv", std::ios::out);
+        for (int i = 0; i < right.getHeight(); ++i) {
+            for (int j = 0; j < right.getWidth(); ++j) {
+                f << right.get(j, i);
+                if (j < right.getWidth() - 1) f << ",";
+                else f << "\n";
+            }
+        }
+
         assert(false);
     }
 
-    const double x_m = (A.get(n - 2, m - 1) == 0) 
-        ? 0.0
-        : A.get(n - 1, m - 1) / A.get(n - 2, m - 1);
+    const double x_m = A.get(n - 1, m - 1) / A.get(n - 2, m - 1);
     result->set(0, m - 1, x_m);
     for (int i = m - 2; i >= 0; --i) {
         const double b_i = A.get(n - 1, i);
@@ -87,11 +116,39 @@ bool atg_scs::GaussianEliminationSleSolver::solve(
 
     for (int i = 0; i < m; ++i) {
         if (std::isnan(result->get(0, i)) || std::isinf(result->get(0, i))) {
+            std::fstream f("bad_matrix.csv", std::ios::out);
+            for (int i = 0; i < left.getHeight(); ++i) {
+                for (int j = 0; j < left.getWidth(); ++j) {
+                    f << left.get(j, i);
+                    if (j < left.getWidth() - 1) f << ",";
+                    else f << "\n";
+                }
+            }
+
+            f.close();
+            f.open("rref.csv", std::ios::out);
+            for (int i = 0; i < A.getHeight(); ++i) {
+                for (int j = 0; j < A.getWidth(); ++j) {
+                    f << A.get(j, i);
+                    if (j < A.getWidth() - 1) f << ",";
+                    else f << "\n";
+                }
+            }
+
+            f.close();
+            f.open("bad_vector.csv", std::ios::out);
+            for (int i = 0; i < right.getHeight(); ++i) {
+                for (int j = 0; j < right.getWidth(); ++j) {
+                    f << right.get(j, i);
+                    if (j < right.getWidth() - 1) f << ",";
+                    else f << "\n";
+                }
+            }
+            f.close();
+
             assert(false);
         }
     }
-
-    A.destroy();
 
     return true;
 }

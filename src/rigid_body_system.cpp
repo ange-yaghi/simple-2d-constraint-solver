@@ -2,6 +2,7 @@
 
 #include <assert.h>
 #include <chrono>
+#include <cmath>
 
 atg_scs::RigidBodySystem::RigidBodySystem() {
     m_sleSolver = nullptr;
@@ -248,8 +249,8 @@ void atg_scs::RigidBodySystem::processForces() {
 }
 
 void atg_scs::RigidBodySystem::processConstraints(
-        int *evalTime,
-        int *solveTime)
+    int *evalTime,
+    int *solveTime)
 {
     *evalTime = -1;
     *solveTime = -1;
@@ -281,15 +282,10 @@ void atg_scs::RigidBodySystem::processConstraints(
             for (int i = 0; i < m_constraints[j]->m_bodyCount * 3; ++i) {
                 const int index = m_constraints[j]->m_bodies[i / 3]->index;
 
+                if (index == -1) continue;
+
                 m_iv.J.set(index * 3 + (i % 3), c_i + k,
                         constraintOutput.dC_dq[k][i]);
-
-                //m_iv.J_dot.set(i * 3 + 0, c_i + k,
-                //    constraintOutput.d2C_dq2[k][0] * m_state.v_x[i]);
-                //m_iv.J_dot.set(i * 3 + 1, c_i + k,
-                //    constraintOutput.d2C_dq2[k][1] * m_state.v_y[i]);
-                //m_iv.J_dot.set(i * 3 + 2, c_i + k,
-                //    constraintOutput.d2C_dq2[k][2] * m_state.v_theta[i]);
 
                 double j_dot = 0;
                 for (int i_q = 0; i_q < m_constraints[j]->m_bodyCount * 3; ++i_q) {

@@ -32,7 +32,7 @@ void atg_scs::Spring::apply(SystemState *state) {
         m_body1->localToWorld(m_p1_x, m_p1_y, &x1, &y1);
     }
 
-    if (m_body2->index != 1) {
+    if (m_body2->index != -1) {
         state->localToWorld(m_p2_x, m_p2_y, &x2, &y2, m_body2->index);
         state->velocityAtPoint(m_p2_x, m_p2_y, &v_x2, &v_y2, m_body2->index);
     }
@@ -63,19 +63,25 @@ void atg_scs::Spring::apply(SystemState *state) {
         std::fmax(-10.0, v)
     );
 
+    double x = l - m_restLength;
+    x = std::fmin(
+        10.0,
+        std::fmax(-10.0, x)
+    );
+
     state->applyForce(
         m_p1_x,
         m_p1_y,
-        dx * ((l - m_restLength) * m_ks + v * m_kd),
-        dy * ((l - m_restLength) * m_ks + v * m_kd),
+        dx * (x * m_ks + v * m_kd),
+        dy * (x * m_ks + v * m_kd),
         m_body1->index
     );
 
     state->applyForce(
         m_p2_x,
         m_p2_y,
-        -dx * ((l - m_restLength) * m_ks + v * m_kd),
-        -dy * ((l - m_restLength) * m_ks + v * m_kd),
+        -dx * (x * m_ks + v * m_kd),
+        -dy * (x * m_ks + v * m_kd),
         m_body2->index
     );
 }
@@ -92,19 +98,10 @@ double atg_scs::Spring::energy() const {
     m_body1->localToWorld(m_p1_x, m_p1_y, &x1, &y1);
     m_body2->localToWorld(m_p2_x, m_p2_y, &x2, &y2);
 
-    double dx = x2 - x1;
-    double dy = y2 - y1;
+    const double dx = x2 - x1;
+    const double dy = y2 - y1;
 
     const double l = std::sqrt(dx * dx + dy * dy);
-
-    if (l != 0) {
-        dx /= l;
-        dy /= l;
-    }
-    else {
-        dx = 1.0;
-        dy = 0.0;
-    }
 
     return 0.5 * m_ks * (l - m_restLength) * (l - m_restLength);
 }

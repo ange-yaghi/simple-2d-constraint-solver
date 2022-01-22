@@ -28,6 +28,9 @@ void atg_scs::LinkConstraint::calculate(
     const double q5 = state->p_y[linkedBody];
     const double q6 = state->theta[linkedBody];
 
+    const double q3_dot = state->v_theta[body];
+    const double q6_dot = state->v_theta[linkedBody];
+
     const double cos_q3 = std::cos(q3);
     const double sin_q3 = std::sin(q3);
 
@@ -40,150 +43,44 @@ void atg_scs::LinkConstraint::calculate(
     const double linkedBodyX = q4 + cos_q6 * m_local_x_2 - sin_q6 * m_local_y_2;
     const double linkedBodyY = q5 + sin_q6 * m_local_x_2 + cos_q6 * m_local_y_2;
 
-    // Main body
-    const double dbodyX_dq1 = 1.0;
-    const double dbodyX_dq2 = 0.0;
-    const double dbodyX_dq3 = -sin_q3 * m_local_x_1 - cos_q3 * m_local_y_1;
-
-    const double dbodyY_dq1 = 0.0;
-    const double dbodyY_dq2 = 1.0;
-    const double dbodyY_dq3 = cos_q3 * m_local_x_1 - sin_q3 * m_local_y_1;
-
-    const double d2bodyX_dq3_2 = -cos_q3 * m_local_x_1 + sin_q3 * m_local_y_1;
-    const double d2bodyY_dq3_2 = -sin_q3 * m_local_x_1 - cos_q3 * m_local_y_1;
-
-    // Linked Body
-    const double dlinkedBodyX_dq4 = 1.0;
-    const double dlinkedBodyX_dq5 = 0.0;
-    const double dlinkedBodyX_dq6 = -sin_q6 * m_local_x_2 - cos_q6 * m_local_y_2;
-
-    const double dlinkedBodyY_dq4 = 0.0;
-    const double dlinkedBodyY_dq5 = 1.0;
-    const double dlinkedBodyY_dq6 = cos_q6 * m_local_x_2 - sin_q6 * m_local_y_2;
-
-    const double d2linkedBodyX_dq6_2 = -cos_q6 * m_local_x_2 + sin_q6 * m_local_y_2;
-    const double d2linkedBodyY_dq6_2 = -sin_q6 * m_local_x_2 - cos_q6 * m_local_y_2;
-
     const double C1 = bodyX - linkedBodyX;
     const double C2 = bodyY - linkedBodyY;
 
-    output->dC_dq[0][0] = dbodyX_dq1;
-    output->dC_dq[0][1] = dbodyX_dq2;
-    output->dC_dq[0][2] = dbodyX_dq3;
+    output->J[0][0] = 1.0;
+    output->J[0][1] = 0.0;
+    output->J[0][2] = -sin_q3 * m_local_x_1 - cos_q3 * m_local_y_1;
 
-    output->dC_dq[1][0] = dbodyY_dq1;
-    output->dC_dq[1][1] = dbodyY_dq2;
-    output->dC_dq[1][2] = dbodyY_dq3;
+    output->J[1][0] = 0.0;
+    output->J[1][1] = 1.0;
+    output->J[1][2] = cos_q3 * m_local_x_1 - sin_q3 * m_local_y_1;
 
-    output->dC_dq[0][3] = -dlinkedBodyX_dq4;
-    output->dC_dq[0][4] = -dlinkedBodyX_dq5;
-    output->dC_dq[0][5] = -dlinkedBodyX_dq6;
+    output->J[0][3] = -1.0;
+    output->J[0][4] = 0.0;
+    output->J[0][5] = sin_q6 * m_local_x_2 + cos_q6 * m_local_y_2;
 
-    output->dC_dq[1][3] = -dlinkedBodyY_dq4;
-    output->dC_dq[1][4] = -dlinkedBodyY_dq5;
-    output->dC_dq[1][5] = -dlinkedBodyY_dq6;
+    output->J[1][3] = 0.0;
+    output->J[1][4] = -1.0;
+    output->J[1][5] = -cos_q6 * m_local_x_2 + sin_q6 * m_local_y_2;
 
-    // d/dq1
-    output->d2C_dq2[0][0][0] = 0;
-    output->d2C_dq2[0][0][1] = 0;
-    output->d2C_dq2[0][0][2] = 0;
+    output->J_dot[0][0] = 0;
+    output->J_dot[0][1] = 0;
+    output->J_dot[0][2] =
+        -cos_q3 * q3_dot * m_local_x_1 + sin_q3 * q3_dot * m_local_y_1;
 
-    output->d2C_dq2[0][1][0] = 0;
-    output->d2C_dq2[0][1][1] = 0;
-    output->d2C_dq2[0][1][2] = 0;
+    output->J_dot[1][0] = 0;
+    output->J_dot[1][1] = 0;
+    output->J_dot[1][2] =
+        -sin_q3 * q3_dot * m_local_x_1 - cos_q3 * q3_dot * m_local_y_1;
 
-    output->d2C_dq2[0][0][3] = 0;
-    output->d2C_dq2[0][0][4] = 0;
-    output->d2C_dq2[0][0][5] = 0;
+    output->J_dot[0][3] = 0;
+    output->J_dot[0][4] = 0;
+    output->J_dot[0][5] =
+        cos_q6 * q6_dot * m_local_x_2 - sin_q6 * q6_dot * m_local_y_2;
 
-    output->d2C_dq2[0][1][3] = 0;
-    output->d2C_dq2[0][1][4] = 0;
-    output->d2C_dq2[0][1][5] = 0;
-
-    // d/dq2
-    output->d2C_dq2[1][0][0] = 0;
-    output->d2C_dq2[1][0][1] = 0;
-    output->d2C_dq2[1][0][2] = 0;
-
-    output->d2C_dq2[1][1][0] = 0;
-    output->d2C_dq2[1][1][1] = 0;
-    output->d2C_dq2[1][1][2] = 0;
-
-    output->d2C_dq2[1][0][3] = 0;
-    output->d2C_dq2[1][0][4] = 0;
-    output->d2C_dq2[1][0][5] = 0;
-
-    output->d2C_dq2[1][1][3] = 0;
-    output->d2C_dq2[1][1][4] = 0;
-    output->d2C_dq2[1][1][5] = 0;
-
-    // d/dq3
-    output->d2C_dq2[2][0][0] = 0;
-    output->d2C_dq2[2][0][1] = 0;
-    output->d2C_dq2[2][0][2] = d2bodyX_dq3_2;
-
-    output->d2C_dq2[2][1][0] = 0;
-    output->d2C_dq2[2][1][1] = 0;
-    output->d2C_dq2[2][1][2] = d2bodyY_dq3_2;
-
-    output->d2C_dq2[2][0][3] = 0;
-    output->d2C_dq2[2][0][4] = 0;
-    output->d2C_dq2[2][0][5] = 0;
-
-    output->d2C_dq2[2][1][3] = 0;
-    output->d2C_dq2[2][1][4] = 0;
-    output->d2C_dq2[2][1][5] = 0;
-
-    // d/dq4
-    output->d2C_dq2[3][0][0] = 0;
-    output->d2C_dq2[3][0][1] = 0;
-    output->d2C_dq2[3][0][2] = 0;
-
-    output->d2C_dq2[3][1][0] = 0;
-    output->d2C_dq2[3][1][1] = 0;
-    output->d2C_dq2[3][1][2] = 0;
-
-    output->d2C_dq2[3][0][3] = 0;
-    output->d2C_dq2[3][0][4] = 0;
-    output->d2C_dq2[3][0][5] = 0;
-
-    output->d2C_dq2[3][1][3] = 0;
-    output->d2C_dq2[3][1][4] = 0;
-    output->d2C_dq2[3][1][5] = 0;
-
-    // d/dq5
-    output->d2C_dq2[4][0][0] = 0;
-    output->d2C_dq2[4][0][1] = 0;
-    output->d2C_dq2[4][0][2] = 0;
-
-    output->d2C_dq2[4][1][0] = 0;
-    output->d2C_dq2[4][1][1] = 0;
-    output->d2C_dq2[4][1][2] = 0;
-
-    output->d2C_dq2[4][0][3] = 0;
-    output->d2C_dq2[4][0][4] = 0;
-    output->d2C_dq2[4][0][5] = 0;
-
-    output->d2C_dq2[4][1][3] = 0;
-    output->d2C_dq2[4][1][4] = 0;
-    output->d2C_dq2[4][1][5] = 0;
-
-    // d/dq6
-    output->d2C_dq2[5][0][0] = 0;
-    output->d2C_dq2[5][0][1] = 0;
-    output->d2C_dq2[5][0][2] = 0;
-
-    output->d2C_dq2[5][1][0] = 0;
-    output->d2C_dq2[5][1][1] = 0;
-    output->d2C_dq2[5][1][2] = 0;
-
-    output->d2C_dq2[5][0][3] = 0;
-    output->d2C_dq2[5][0][4] = 0;
-    output->d2C_dq2[5][0][5] = -d2linkedBodyX_dq6_2;
-
-    output->d2C_dq2[5][1][3] = 0;
-    output->d2C_dq2[5][1][4] = 0;
-    output->d2C_dq2[5][1][5] = -d2linkedBodyY_dq6_2;
+    output->J_dot[1][3] = 0;
+    output->J_dot[1][4] = 0;
+    output->J_dot[1][5] =
+        sin_q6 * q6_dot * m_local_x_2 + cos_q6 * q6_dot * m_local_y_2;
 
     output->kd[0] = output->kd[1] = m_kd;
     output->ks[0] = m_ks * C1;

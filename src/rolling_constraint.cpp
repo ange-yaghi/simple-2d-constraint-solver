@@ -29,6 +29,13 @@ void atg_scs::RollingConstraint::calculate(
     const double q5 = state->p_y[rollingBody];
     const double q6 = state->theta[rollingBody];
 
+    const double q1_dot = state->v_x[baseBody];
+    const double q2_dot = state->v_y[baseBody];
+    const double q3_dot = state->v_theta[baseBody];
+
+    const double q4_dot = state->v_x[rollingBody];
+    const double q5_dot = state->v_y[rollingBody];
+
     const double cos_q3 = std::cos(q3);
     const double sin_q3 = std::sin(q3);
 
@@ -37,11 +44,19 @@ void atg_scs::RollingConstraint::calculate(
     const double dx = cos_q3 * m_dx - sin_q3 * m_dy;
     const double dy = sin_q3 * m_dx + cos_q3 * m_dy;
 
+    const double dx_dot = -sin_q3 * q3_dot * m_dx - cos_q3 * q3_dot * m_dy;
+    const double dy_dot = cos_q3 * q3_dot * m_dx - sin_q3 * q3_dot * m_dy;
+
     const double perp_x = -dy;
     const double perp_y = dx;
 
     const double delta_x = q4 - origin_x;
     const double delta_y = q5 - origin_y;
+
+    const double delta_x_dot =
+        q4_dot - (q1_dot - sin_q3 * q3_dot * m_local_x - cos_q3 * q3_dot * m_local_y);
+    const double delta_y_dot =
+        q5_dot - (q2_dot + cos_q3 * q3_dot * m_local_x - sin_q3 * q3_dot * m_local_y);
 
     const double s = delta_x * dx + delta_y * dy;
 
@@ -62,8 +77,12 @@ void atg_scs::RollingConstraint::calculate(
     const double d_dx_dq3 = -dy;
     const double d_dy_dq3 = dx;
 
-    const double d2_dx_dq3_2 = -d_dy_dq3;
-    const double d2_dy_dq3_2 = d_dx_dq3;
+    const double d_dx_dq3_dot = -cos_q3 * q3_dot * m_dx + sin_q3 * q3_dot * m_dy;
+    const double d_dy_dq3_dot = -sin_q3 * q3_dot * m_dx - cos_q3 * q3_dot * m_dy;
+    const double d_delta_x_dq3_dot =
+        cos_q3 * q3_dot * m_local_x - sin_q3 * q3_dot * m_local_y;
+    const double d_delta_y_dq3_dot =
+        sin_q3 * q3_dot * m_local_x + cos_q3 * q3_dot * m_local_y;
 
     const double ds_dq1 = d_delta_x_dq1 * dx;
     const double ds_dq2 = d_delta_y_dq2 * dy;
@@ -71,154 +90,57 @@ void atg_scs::RollingConstraint::calculate(
         (d_delta_x_dq3 * dx + delta_x * d_dx_dq3) +
         (d_delta_y_dq3 * dy + delta_y * d_dy_dq3);
 
-    // Second derivatives
-    const double d2_origin_x_dq3_2 = -d_origin_y_dq3;
-    const double d2_origin_y_dq3_2 = d_origin_x_dq3;
+    const double ds_dq1_dot =
+        d_delta_x_dq1 * dx_dot;
+    const double ds_dq2_dot =
+        d_delta_y_dq2 * dy_dot;
+    const double ds_dq3_dot =
+        (d_delta_x_dq3_dot * dx + d_delta_x_dq3 * dx_dot) +
+        (delta_x_dot * d_dx_dq3 + delta_x * d_dx_dq3_dot) +
+        (d_delta_y_dq3_dot * dy + d_delta_y_dq3 * dy_dot) +
+        (delta_y_dot * d_dy_dq3 + delta_y * d_dy_dq3_dot);
 
-    const double d2_delta_x_dq3_2 = -d2_origin_x_dq3_2;
-    const double d2_delta_y_dq3_2 = -d2_origin_y_dq3_2;
-
-    const double d2s_dq3_2 =
-        (d2_delta_x_dq3_2 * dx + d_delta_x_dq3 * d_dx_dq3) +
-        (d_delta_x_dq3 * d_dx_dq3 + delta_x * d2_dx_dq3_2) +
-        (d2_delta_y_dq3_2 * dy + d_delta_y_dq3 * d_dy_dq3) +
-        (d_delta_y_dq3 * d_dy_dq3 + delta_y * d2_dy_dq3_2);
-
-    output->dC_dq[0][0] = -ds_dq1 * m_radius;
-    output->dC_dq[0][1] = -ds_dq2 * m_radius;
-    output->dC_dq[0][2] = -ds_dq3 * m_radius;
+    output->J[0][0] = -ds_dq1 * m_radius;
+    output->J[0][1] = -ds_dq2 * m_radius;
+    output->J[0][2] = -ds_dq3 * m_radius;
 
     // C1 = m_radius + dy * delta_x - dx * delta_y
-    output->dC_dq[1][0] = dy * d_delta_x_dq1;
-    output->dC_dq[1][1] = -dx * d_delta_y_dq2;
-    output->dC_dq[1][2] =
+    output->J[1][0] = dy * d_delta_x_dq1;
+    output->J[1][1] = -dx * d_delta_y_dq2;
+    output->J[1][2] =
         (d_dy_dq3 * delta_x + dy * d_delta_x_dq3) -
         (d_dx_dq3 * delta_y + dx * d_delta_y_dq3);
 
-    output->dC_dq[0][3] = -1 * dx * m_radius;
-    output->dC_dq[0][4] = -1 * dy * m_radius;
-    output->dC_dq[0][5] = -1;
+    output->J[0][3] = -1 * dx * m_radius;
+    output->J[0][4] = -1 * dy * m_radius;
+    output->J[0][5] = -1;
 
-    output->dC_dq[1][3] = dy * d_delta_x_dq4;
-    output->dC_dq[1][4] = -dx * d_delta_y_dq5;
-    output->dC_dq[1][5] = 0;
+    output->J[1][3] = dy * d_delta_x_dq4;
+    output->J[1][4] = -dx * d_delta_y_dq5;
+    output->J[1][5] = 0;
 
-    // Second derivatives
+    output->J_dot[0][0] = -ds_dq1_dot * m_radius;
+    output->J_dot[0][1] = -ds_dq2_dot * m_radius;
+    output->J_dot[0][2] = -ds_dq3_dot * m_radius;
 
-    const double d2C_dq3_2 =
-        (d2_dy_dq3_2 * delta_x + d_dy_dq3 * d_delta_x_dq3) +
-        (d_dy_dq3 * d_delta_x_dq3 + dy * d2_delta_x_dq3_2) -
-        (d2_dx_dq3_2 * delta_y + d_dx_dq3 * d_delta_y_dq3) -
-        (d_dx_dq3 * d_delta_y_dq3 + dx * d2_delta_y_dq3_2);
+    output->J_dot[1][0] = dy_dot * d_delta_x_dq1;
+    output->J_dot[1][1] = -dx_dot * d_delta_y_dq2;
+    output->J_dot[1][2] =
+        (d_dy_dq3_dot * delta_x + d_dy_dq3 * delta_x_dot) +
+        (dy_dot * d_delta_x_dq3 + dy * d_delta_x_dq3_dot) -
+        (d_dx_dq3_dot * delta_y + d_dx_dq3 * delta_y_dot) -
+        (dx_dot * d_delta_y_dq3 + dx * d_delta_y_dq3_dot);
 
-    // d/dq1
-    output->d2C_dq2[0][0][0] = 0;
-    output->d2C_dq2[0][0][1] = 0;
-    output->d2C_dq2[0][0][2] =
-        -d_delta_x_dq1 * d_dx_dq3 * m_radius;
+    output->J_dot[0][3] = -1 * dx_dot * m_radius;
+    output->J_dot[0][4] = -1 * dy_dot * m_radius;
+    output->J_dot[0][5] = 0;
 
-    output->d2C_dq2[0][1][0] = 0;
-    output->d2C_dq2[0][1][1] = 0;
-    output->d2C_dq2[0][1][2] =
-        d_dy_dq3 * d_delta_x_dq1;
+    output->J_dot[1][3] = dy_dot * d_delta_x_dq4;
+    output->J_dot[1][4] = -dx_dot * d_delta_y_dq5;
+    output->J_dot[1][5] = 0;
 
-    output->d2C_dq2[0][0][3] = 0;
-    output->d2C_dq2[0][0][4] = 0;
-    output->d2C_dq2[0][0][5] = 0;
-
-    output->d2C_dq2[0][1][3] = 0;
-    output->d2C_dq2[0][1][4] = 0;
-    output->d2C_dq2[0][1][5] = 0;
-
-    // d/dq2
-    output->d2C_dq2[1][0][0] = 0;
-    output->d2C_dq2[1][0][1] = 0;
-    output->d2C_dq2[1][0][2] =
-        -d_delta_y_dq2 * d_dy_dq3 * m_radius;
-
-    output->d2C_dq2[1][1][0] = 0;
-    output->d2C_dq2[1][1][1] = 0;
-    output->d2C_dq2[1][1][2] =
-        -d_dx_dq3 * d_delta_y_dq2;
-
-    output->d2C_dq2[1][0][3] = 0;
-    output->d2C_dq2[1][0][4] = 0;
-    output->d2C_dq2[1][0][5] = 0;
-
-    output->d2C_dq2[1][1][3] = 0;
-    output->d2C_dq2[1][1][4] = 0;
-    output->d2C_dq2[1][1][5] = 0;
-
-    // d/dq3
-    output->d2C_dq2[2][0][0] = -d_delta_x_dq1 * d_dx_dq3 * m_radius;
-    output->d2C_dq2[2][0][1] = -d_delta_y_dq2 * d_dy_dq3 * m_radius;
-    output->d2C_dq2[2][0][2] = -d2s_dq3_2 * m_radius;
-
-    output->d2C_dq2[2][1][0] = d_dy_dq3 * d_delta_x_dq1;
-    output->d2C_dq2[2][1][1] = -d_dx_dq3 * d_delta_y_dq2;
-    output->d2C_dq2[2][1][2] = d2C_dq3_2;
-
-    output->d2C_dq2[2][0][3] = -1 * d_dx_dq3 * m_radius;
-    output->d2C_dq2[2][0][4] = -1 * d_dy_dq3 * m_radius;
-    output->d2C_dq2[2][0][5] = 0;
-
-    output->d2C_dq2[2][1][3] = d_dy_dq3 * d_delta_x_dq4;
-    output->d2C_dq2[2][1][4] = -d_dx_dq3 * d_delta_y_dq5;
-    output->d2C_dq2[2][1][5] = 0;
-
-    // d/dq4
-    output->d2C_dq2[3][0][0] = 0;
-    output->d2C_dq2[3][0][1] = 0;
-    output->d2C_dq2[3][0][2] = -d_delta_x_dq4 * d_dx_dq3 * m_radius;
-
-    output->d2C_dq2[3][1][0] = 0;
-    output->d2C_dq2[3][1][1] = 0;
-    output->d2C_dq2[3][1][2] = d_dy_dq3 * d_delta_x_dq4;
-
-    output->d2C_dq2[3][0][3] = 0;
-    output->d2C_dq2[3][0][4] = 0;
-    output->d2C_dq2[3][0][5] = 0;
-
-    output->d2C_dq2[3][1][3] = 0;
-    output->d2C_dq2[3][1][4] = 0;
-    output->d2C_dq2[3][1][5] = 0;
-
-    // d/dq5
-    output->d2C_dq2[4][0][0] = 0;
-    output->d2C_dq2[4][0][1] = 0;
-    output->d2C_dq2[4][0][2] = -d_delta_y_dq5 * d_dy_dq3 * m_radius;
-
-    output->d2C_dq2[4][1][0] = 0;
-    output->d2C_dq2[4][1][1] = 0;
-    output->d2C_dq2[4][1][2] = -d_dx_dq3 * d_delta_y_dq5;
-
-    output->d2C_dq2[4][0][3] = 0;
-    output->d2C_dq2[4][0][4] = 0;
-    output->d2C_dq2[4][0][5] = 0;
-
-    output->d2C_dq2[4][1][3] = 0;
-    output->d2C_dq2[4][1][4] = 0;
-    output->d2C_dq2[4][1][5] = 0;
-
-    // d/dq6
-    output->d2C_dq2[5][0][0] = 0;
-    output->d2C_dq2[5][0][1] = 0;
-    output->d2C_dq2[5][0][2] = 0;
-
-    output->d2C_dq2[5][1][0] = 0;
-    output->d2C_dq2[5][1][1] = 0;
-    output->d2C_dq2[5][1][2] = 0;
-
-    output->d2C_dq2[5][0][3] = 0;
-    output->d2C_dq2[5][0][4] = 0;
-    output->d2C_dq2[5][0][5] = 0;
-
-    output->d2C_dq2[5][1][3] = 0;
-    output->d2C_dq2[5][1][4] = 0;
-    output->d2C_dq2[5][1][5] = 0;
-
-    output->ks[0] = m_ks * C0;
-    output->kd[0] = m_kd;
+    output->ks[0] = 0;
+    output->kd[0] = 0;
 
     output->ks[1] = m_ks * C1;
     output->kd[1] = m_kd;

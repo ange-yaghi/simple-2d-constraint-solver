@@ -285,19 +285,10 @@ void atg_scs::RigidBodySystem::processConstraints(
                 if (index == -1) continue;
 
                 m_iv.J.set(index * 3 + (i % 3), c_i + k,
-                        constraintOutput.dC_dq[k][i]);
+                        constraintOutput.J[k][i]);
 
-                double j_dot = 0;
-                for (int i_q = 0; i_q < m_constraints[j]->m_bodyCount * 3; ++i_q) {
-                    const int b = m_constraints[j]->m_bodies[i_q / 3]->index;
-
-                    double *all_qdot[] = { m_state.v_x, m_state.v_y, m_state.v_theta };
-                    double *q_dot = all_qdot[i_q % 3];
-
-                    j_dot += constraintOutput.d2C_dq2[i][k][i_q] * q_dot[b];
-                }
-
-                m_iv.J_dot.set(index * 3 + (i % 3), c_i + k, j_dot);
+                m_iv.J_dot.set(index * 3 + (i % 3), c_i + k,
+                        constraintOutput.J_dot[k][i]);
 
                 m_iv.C_ks.set(0, c_i + k, constraintOutput.ks[k]);
                 m_iv.C_kd.set(0, c_i + k, constraintOutput.kd[k]);

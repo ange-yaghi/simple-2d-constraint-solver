@@ -10,7 +10,8 @@ void verify(atg_scs::SystemState *state, atg_scs::Constraint *constraint) {
     const int n = constraint->m_bodyCount;
     const int m = constraint->m_constraintCount;
 
-    const double d = 0.001;
+    const double d = 0.1;
+    const double dt = 0.001;
 
     for (int i = 0; i < m; ++i) {
         std::cerr << "Constraint " << i << "\n";
@@ -24,20 +25,29 @@ void verify(atg_scs::SystemState *state, atg_scs::Constraint *constraint) {
                 state->theta
             };
 
+            double *q_dot[] = {
+                state->v_x,
+                state->v_y,
+                state->v_theta
+            };
+
             const double v0 = q[q_i][j / 3];
+            q_dot[q_i][j / 3] = d;
             constraint->calculate(&o0, state);
-            q[q_i][j / 3] += d;
+            q[q_i][j / 3] += d * dt;
             constraint->calculate(&o1, state);
             q[q_i][j / 3] = v0;
+            q_dot[q_i][j / 3] = 0;
 
-            const double dC = (o1.C[i] - o0.C[i]) / d;
-            EXPECT_NEAR(dC, (o0.dC_dq[i][j] + o1.dC_dq[i][j]) / 2, 1E-4);
+            const double dC = (o1.C[i] - o0.C[i]) / (d * dt);
+            EXPECT_NEAR(dC, (o0.J[i][j] + o1.J[i][j]) / 2, 1E-4);
 
             for (int k = 0; k < n * 3; ++k) {
-                std::cerr << "d/dq " << k + 1 << "\n";
-
-                const double d2C = (o1.dC_dq[i][k] - o0.dC_dq[i][k]) / d;
-                EXPECT_NEAR(d2C, (o0.d2C_dq2[k][i][j] + o1.d2C_dq2[k][i][j]) / 2, 1E-4);
+                for (int l = 0; l < m; ++l) {
+                    std::cerr << l << ", " << k << "\n";
+                    const double J_dot = (o1.J[l][k] - o0.J[l][k]) / dt;
+                    EXPECT_NEAR(J_dot, (o0.J_dot[l][k] + o1.J_dot[l][k]) / 2, 1E-4);
+                }
             }
         }
     }
@@ -78,6 +88,12 @@ TEST(RollingConstraintTests, RollingConstraintTest) {
         system.p_y[1] = (realDist(rng) - 0.5) * 100;
         system.theta[0] = (realDist(rng) - 0.5) * 100;
         system.theta[1] = (realDist(rng) - 0.5) * 100;
+        system.v_x[0] = 0;
+        system.v_x[1] = 0;
+        system.v_y[0] = 0;
+        system.v_y[1] = 0;
+        system.v_theta[0] = 0;
+        system.v_theta[1] = 0;
 
         verify(&system, &constraint);
     }

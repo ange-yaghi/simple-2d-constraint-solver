@@ -24,6 +24,8 @@ void atg_scs::LineConstraint::calculate(
     const double q2 = state->p_y[body];
     const double q3 = state->theta[body];
 
+    const double q3_dot = state->v_theta[body];
+
     const double cos_q3 = std::cos(q3);
     const double sin_q3 = std::sin(q3);
 
@@ -44,29 +46,16 @@ void atg_scs::LineConstraint::calculate(
         (-sin_q3 * m_local_x - cos_q3 * m_local_y) * perpX +
         (cos_q3 * m_local_x - sin_q3 * m_local_y) * perpY;
 
-    const double d2C_dq3_2 =
-        (-cos_q3 * m_local_x + sin_q3 * m_local_y) * perpX +
-        (-sin_q3 * m_local_x - cos_q3 * m_local_y) * perpY;
+    output->J[0][0] = dC_dq1;
+    output->J[0][1] = dC_dq2;
+    output->J[0][2] = dC_dq3;
 
-    output->dC_dq[0][0] = dC_dq1;
-    output->dC_dq[0][1] = dC_dq2;
-    output->dC_dq[0][2] = dC_dq3;
+    output->J_dot[0][0] = 0.0;
+    output->J_dot[0][1] = 0.0;
+    output->J_dot[0][2] =
+        (-cos_q3 * q3_dot * m_local_x + sin_q3 * q3_dot * m_local_y) * perpX +
+        (-sin_q3 * q3_dot * m_local_x - cos_q3 * q3_dot * m_local_y) * perpY;
 
-    // d/dq1
-    output->d2C_dq2[0][0][0] = 0;
-    output->d2C_dq2[0][0][1] = 0;
-    output->d2C_dq2[0][0][2] = 0;
-
-    // d/dq2
-    output->d2C_dq2[1][0][0] = 0;
-    output->d2C_dq2[1][0][1] = 0;
-    output->d2C_dq2[1][0][2] = 0;
-
-    // d/dq3
-    output->d2C_dq2[2][0][0] = 0;
-    output->d2C_dq2[2][0][1] = 0;
-    output->d2C_dq2[2][0][2] = d2C_dq3_2;
-     
     output->ks[0] = m_ks * C;
     output->kd[0] = m_kd;
 }

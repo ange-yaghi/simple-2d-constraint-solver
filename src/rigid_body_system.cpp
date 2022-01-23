@@ -80,7 +80,6 @@ void atg_scs::RigidBodySystem::removeForceGenerator(ForceGenerator *forceGenerat
 
 void atg_scs::RigidBodySystem::process(double dt, int steps) {
     const int n = getRigidBodyCount();
-    const int m = getConstraintCount();
 
     int
         odeSolveTime = 0,
@@ -133,20 +132,6 @@ void atg_scs::RigidBodySystem::process(double dt, int steps) {
         m_rigidBodies[i]->theta = m_state.theta[i];
     }
 
-    for (int i = 0, c_i = 0; i < m; ++i) {
-        const int n_sub = m_constraints[i]->m_constraintCount;
-        for (int j = 0; j < n_sub; ++j, ++c_i) {
-            for (int k = 0; k < m_constraints[i]->m_bodyCount; ++k) {
-                m_constraints[i]->m_f_x[k][j] =
-                    m_iv.R.get(c_i, m_constraints[i]->m_bodies[k]->index * 3 + 0);
-                m_constraints[i]->m_f_x[k][j] =
-                    m_iv.R.get(c_i, m_constraints[i]->m_bodies[k]->index * 3 + 1);
-                m_constraints[i]->m_t[k][j] =
-                    m_iv.R.get(c_i, m_constraints[i]->m_bodies[k]->index * 3 + 2);
-            }
-        }
-    }
-
     m_odeSolveMicroseconds[m_frameIndex] = odeSolveTime;
     m_constraintSolveMicroseconds[m_frameIndex] = constraintSolveTime;
     m_forceEvalMicroseconds[m_frameIndex] = forceEvalTime;
@@ -157,7 +142,7 @@ void atg_scs::RigidBodySystem::process(double dt, int steps) {
 int atg_scs::RigidBodySystem::getFullConstraintCount() const {
     int count = 0;
     for (Constraint *constraint: m_constraints) {
-        count += constraint->m_constraintCount;
+        count += constraint->getConstraintCount();
     }
 
     return count;
@@ -277,8 +262,9 @@ void atg_scs::RigidBodySystem::processConstraints(
     int c_i = 0;
     for (int j = 0; j < m; ++j) {
         m_constraints[j]->calculate(&constraintOutput, &m_state);
+        const int c_n = m_constraints[j]->getConstraintCount();
 
-        for (int k = 0; k < m_constraints[j]->m_constraintCount; ++k) {
+        for (int k = 0; k < c_n; ++k) {
             for (int i = 0; i < m_constraints[j]->m_bodyCount * 3; ++i) {
                 const int index = m_constraints[j]->m_bodies[i / 3]->index;
 
@@ -295,7 +281,7 @@ void atg_scs::RigidBodySystem::processConstraints(
             }
         }
 
-        c_i += m_constraints[j]->getConstraintCount();
+        c_i += c_n;
     }
 
     m_iv.J.multiply(m_iv.q_dot, &m_iv.reg0);
@@ -334,13 +320,6 @@ void atg_scs::RigidBodySystem::processConstraints(
     auto s2 = std::chrono::steady_clock::now();
 
     m_iv.J_T.multiply(m_iv.lambda, &m_iv.F_C);
-
-    m_iv.lambdaScale.initialize(m_f, m_f, 0.0);
-    for (int i = 0; i < m_f; ++i) {
-        m_iv.lambdaScale.set(i, i, m_iv.lambda.get(0, i));
-    }
-
-    m_iv.J_T.multiply(m_iv.lambdaScale, &m_iv.R);
 
     for (int i = 0; i < n; ++i) {
         const double invMass = m_iv.M_inv.get(i * 3 + 0, i * 3 + 0);

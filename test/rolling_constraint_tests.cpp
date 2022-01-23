@@ -8,7 +8,7 @@
 void verify(atg_scs::SystemState *state, atg_scs::Constraint *constraint) {
     atg_scs::Constraint::Output o0, o1;
     const int n = constraint->m_bodyCount;
-    const int m = constraint->m_constraintCount;
+    const int m = constraint->getConstraintCount();
 
     const double d = 0.1;
     const double dt = 0.001;
@@ -56,7 +56,6 @@ void verify(atg_scs::SystemState *state, atg_scs::Constraint *constraint) {
 TEST(RollingConstraintTests, RollingConstraintTest) {
     atg_scs::RollingConstraint constraint;
     atg_scs::SystemState system;
-    atg_scs::Constraint::Output o0, o1;
 
     system.resize(2);
 

@@ -82,11 +82,8 @@ namespace atg_scs {
                 Matrix right, left;
                 Matrix F_ext, F_C;
 
-                Matrix lambdaScale;
-
                 // Results
                 Matrix lambda;
-                Matrix R;
             };
 
             IntermediateValues m_iv;

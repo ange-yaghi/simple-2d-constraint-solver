@@ -7,7 +7,7 @@
 namespace atg_scs {
     class Constraint {
         public:
-            static constexpr int MaxConstraintCount = 4;
+            static constexpr int MaxConstraintCount = 6;
             static constexpr int MaxBodyCount = 2;
 
             struct Output {
@@ -18,23 +18,22 @@ namespace atg_scs {
                 double kd[MaxConstraintCount];
             };
 
+            struct Lambda {
+                double lambda[MaxConstraintCount];
+            };
+
         public:
             Constraint(int constraintCount, int bodyCount);
             virtual ~Constraint();
 
             virtual void calculate(Output *output, SystemState *state);
-
-            int getConstraintCount() const { return m_constraintCount; }
+            virtual int getConstraintCount() const { return m_constraintCount; }
 
             int m_index;
-
             int m_bodyCount;
             RigidBody *m_bodies[MaxBodyCount];
 
-            double m_f_x[MaxBodyCount][MaxConstraintCount];
-            double m_f_y[MaxBodyCount][MaxConstraintCount];
-            double m_t[MaxBodyCount][MaxConstraintCount];
-
+        protected:
             int m_constraintCount;
     };
 } /* namespace atg_scs */

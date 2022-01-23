@@ -4,7 +4,7 @@ atg_scs::Constraint::Constraint(int constraintCount, int bodyCount) {
     m_constraintCount = constraintCount;
     m_bodyCount = bodyCount;
 
-    m_index = -1; 
+    m_index = -1;
 }
 
 atg_scs::Constraint::~Constraint() {

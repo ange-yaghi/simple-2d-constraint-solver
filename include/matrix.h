@@ -20,13 +20,13 @@ namespace atg_scs {
             void multiply(Matrix &b, Matrix *target);
             void subtract(Matrix &b, Matrix *target);
             void negate(Matrix *target);
+
             void transpose(Matrix *target);
-        
             int getWidth() const { return m_width; }
             int getHeight() const { return m_height; }
 
             void fastRowSwap(int a, int b);
-        
+
         protected:
             double **m_matrix;
             double *m_data;

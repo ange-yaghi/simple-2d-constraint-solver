@@ -70,8 +70,11 @@ void atg_scs::FixedPositionConstraint::calculate(
     output->J_dot[1][2] =
         -sin_q3 * q3_dot * m_local_x - cos_q3 * q3_dot * m_local_y;
 
-    output->ks[0] = m_ks * C1;
-    output->ks[1] = m_ks * C2;
+    output->ks[0] = m_ks;
+    output->ks[1] = m_ks;
 
     output->kd[0] = output->kd[1] = m_kd;
+
+    output->C[0] = C1;
+    output->C[1] = C2;
 }

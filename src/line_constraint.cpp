@@ -56,6 +56,8 @@ void atg_scs::LineConstraint::calculate(
         (-cos_q3 * q3_dot * m_local_x + sin_q3 * q3_dot * m_local_y) * perpX +
         (-sin_q3 * q3_dot * m_local_x - cos_q3 * q3_dot * m_local_y) * perpY;
 
-    output->ks[0] = m_ks * C;
+    output->ks[0] = m_ks;
     output->kd[0] = m_kd;
+
+    output->C[0] = C;
 }

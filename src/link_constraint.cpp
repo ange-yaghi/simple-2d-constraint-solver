@@ -83,8 +83,11 @@ void atg_scs::LinkConstraint::calculate(
         sin_q6 * q6_dot * m_local_x_2 + cos_q6 * q6_dot * m_local_y_2;
 
     output->kd[0] = output->kd[1] = m_kd;
-    output->ks[0] = m_ks * C1;
-    output->ks[1] = m_ks * C2;
+    output->ks[0] = m_ks;
+    output->ks[1] = m_ks;
+
+    output->C[0] = C1;
+    output->C[1] = C2;
 }
 
 void atg_scs::LinkConstraint::setLocalPosition1(double x, double y) {

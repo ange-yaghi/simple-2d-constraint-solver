@@ -41,7 +41,7 @@ void atg_scs::Spring::apply(SystemState *state) {
     else {
         m_body2->localToWorld(m_p2_x, m_p2_y, &x2, &y2);
     }
-    
+
     double dx = x2 - x1;
     double dy = y2 - y1;
 
@@ -59,17 +59,8 @@ void atg_scs::Spring::apply(SystemState *state) {
     const double rel_v_x = (v_x2 - v_x1);
     const double rel_v_y = (v_y2 - v_y1);
 
-    double v = dx * rel_v_x + dy * rel_v_y;
-    v = std::fmin(
-        10.0,
-        std::fmax(-10.0, v)
-    );
-
-    double x = l - m_restLength;
-    x = std::fmin(
-        10.0,
-        std::fmax(-10.0, x)
-    );
+    const double v = dx * rel_v_x + dy * rel_v_y;
+    const double x = l - m_restLength;
 
     state->applyForce(
         m_p1_x,

@@ -142,7 +142,7 @@ void atg_scs::RollingConstraint::calculate(
     output->ks[0] = 0;
     output->kd[0] = 0;
 
-    output->ks[1] = m_ks * C1;
+    output->ks[1] = m_ks;
     output->kd[1] = m_kd;
 
     output->C[0] = C0;

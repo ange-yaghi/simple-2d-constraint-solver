@@ -74,7 +74,8 @@ namespace atg_scs {
             struct IntermediateValues {
                 Matrix J, J_dot, J_T;
                 Matrix M, M_inv;
-                Matrix C_ks, C_kd;
+                Matrix C;
+                Matrix ks, kd;
                 Matrix q_dot;
 
                 Matrix reg0, reg1, reg2;

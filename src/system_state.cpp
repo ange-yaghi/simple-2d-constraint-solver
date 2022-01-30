@@ -36,23 +36,23 @@ void atg_scs::SystemState::copy(SystemState *state) {
     resize(state->n);
 
     if (state->n == 0) {
-        return; 
+        return;
     }
 
-    std::memcpy((void *)a_theta, (void *)state->a_theta, sizeof(double) * this->n);    
-    std::memcpy((void *)v_theta, (void *)state->v_theta, sizeof(double) * this->n);    
-    std::memcpy((void *)theta, (void *)state->theta, sizeof(double) * this->n);    
+    std::memcpy((void *)a_theta, (void *)state->a_theta, sizeof(double) * this->n);
+    std::memcpy((void *)v_theta, (void *)state->v_theta, sizeof(double) * this->n);
+    std::memcpy((void *)theta, (void *)state->theta, sizeof(double) * this->n);
 
-    std::memcpy((void *)a_x, (void *)state->a_x, sizeof(double) * this->n);    
-    std::memcpy((void *)a_y, (void *)state->a_y, sizeof(double) * this->n);    
-    std::memcpy((void *)v_x, (void *)state->v_x, sizeof(double) * this->n);    
-    std::memcpy((void *)v_y, (void *)state->v_y, sizeof(double) * this->n);    
-    std::memcpy((void *)p_x, (void *)state->p_x, sizeof(double) * this->n);    
-    std::memcpy((void *)p_y, (void *)state->p_y, sizeof(double) * this->n);    
+    std::memcpy((void *)a_x, (void *)state->a_x, sizeof(double) * this->n);
+    std::memcpy((void *)a_y, (void *)state->a_y, sizeof(double) * this->n);
+    std::memcpy((void *)v_x, (void *)state->v_x, sizeof(double) * this->n);
+    std::memcpy((void *)v_y, (void *)state->v_y, sizeof(double) * this->n);
+    std::memcpy((void *)p_x, (void *)state->p_x, sizeof(double) * this->n);
+    std::memcpy((void *)p_y, (void *)state->p_y, sizeof(double) * this->n);
 
-    std::memcpy((void *)f_x, (void *)state->f_x, sizeof(double) * this->n);    
-    std::memcpy((void *)f_y, (void *)state->f_y, sizeof(double) * this->n);    
-    std::memcpy((void *)t, (void *)state->t, sizeof(double) * this->n);    
+    std::memcpy((void *)f_x, (void *)state->f_x, sizeof(double) * this->n);
+    std::memcpy((void *)f_y, (void *)state->f_y, sizeof(double) * this->n);
+    std::memcpy((void *)t, (void *)state->t, sizeof(double) * this->n);
 
     std::memcpy((void *)m, (void *)state->m, sizeof(double) * this->n);
 }
@@ -63,7 +63,7 @@ void atg_scs::SystemState::resize(int bodyCount) {
     }
 
     destroy();
-    
+
     this->n = bodyCount;
 
     a_theta = new double[n];
@@ -138,7 +138,7 @@ void atg_scs::SystemState::velocityAtPoint(
     const double v_theta = this->v_theta[body];
     const double angularToLinear_x = -v_theta * (w_y - this->p_y[body]);
     const double angularToLinear_y = v_theta * (w_x - this->p_x[body]);
-    
+
     *v_x = this->v_x[body] + angularToLinear_x;
     *v_y = this->v_y[body] + angularToLinear_y;
 }

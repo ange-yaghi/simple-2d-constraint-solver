@@ -255,8 +255,9 @@ void atg_scs::RigidBodySystem::processConstraints(
 
     m_iv.J.initialize(3 * n, m_f, 0.0);
     m_iv.J_dot.initialize(3 * n, m_f, 0.0);
-    m_iv.C_ks.initialize(1, m_f, 0.0);
-    m_iv.C_kd.initialize(1, m_f, 0.0);
+    m_iv.ks.initialize(1, m_f, 0.0);
+    m_iv.kd.initialize(1, m_f, 0.0);
+    m_iv.C.initialize(1, m_f, 0.0);
 
     Constraint::Output constraintOutput;
     int c_i = 0;
@@ -276,8 +277,9 @@ void atg_scs::RigidBodySystem::processConstraints(
                 m_iv.J_dot.set(index * 3 + (i % 3), c_i + k,
                         constraintOutput.J_dot[k][i]);
 
-                m_iv.C_ks.set(0, c_i + k, constraintOutput.ks[k]);
-                m_iv.C_kd.set(0, c_i + k, constraintOutput.kd[k]);
+                m_iv.ks.set(0, c_i + k, constraintOutput.ks[k]);
+                m_iv.kd.set(0, c_i + k, constraintOutput.kd[k]);
+                m_iv.C.set(0, c_i + k, constraintOutput.C[k]);
             }
         }
 
@@ -286,7 +288,8 @@ void atg_scs::RigidBodySystem::processConstraints(
 
     m_iv.J.multiply(m_iv.q_dot, &m_iv.reg0);
     for (int i = 0; i < m_f; ++i) {
-        m_iv.C_kd.set(0, i, m_iv.C_kd.get(0, i) * m_iv.reg0.get(0, i));
+        m_iv.kd.set(0, i, m_iv.kd.get(0, i) * m_iv.reg0.get(0, i));
+        m_iv.ks.set(0, i, m_iv.ks.get(0, i) * m_iv.C.get(0, i));
     }
 
     m_iv.J.transpose(&m_iv.J_T);
@@ -308,8 +311,8 @@ void atg_scs::RigidBodySystem::processConstraints(
     m_iv.reg2.multiply(m_iv.F_ext, &m_iv.reg0);
 
     m_iv.reg1.subtract(m_iv.reg0, &m_iv.reg2);
-    m_iv.reg2.subtract(m_iv.C_ks, &m_iv.reg1);
-    m_iv.reg1.subtract(m_iv.C_kd, &m_iv.right);
+    m_iv.reg2.subtract(m_iv.ks, &m_iv.reg1);
+    m_iv.reg1.subtract(m_iv.kd, &m_iv.right);
 
     auto s1 = std::chrono::steady_clock::now();
 

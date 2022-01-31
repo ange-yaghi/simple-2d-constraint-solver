@@ -11,7 +11,7 @@ atg_scs::Rk4OdeSolver::~Rk4OdeSolver() {
 
 void atg_scs::Rk4OdeSolver::start(SystemState *initial, double dt) {
     OdeSolver::start(initial, dt);
-    
+
     m_initialState.copy(initial);
     m_accumulator.copy(initial);
 

@@ -1,3 +1,3 @@
 # Simple 2D Constraint Solver
 
-This is a simple constraint solver and physics engine writtin in C++.
+This is a simple constraint solver and physics engine written in C++.

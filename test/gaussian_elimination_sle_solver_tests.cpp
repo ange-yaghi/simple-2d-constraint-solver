@@ -1,5 +1,7 @@
 #include <gtest/gtest.h>
 
+#include "utilities.h"
+
 #include "../include/gauss_seidel_sle_solver.h"
 
 TEST(GaussSeidelSleSolverTests, GaussSeidelSleSolverSanity) {
@@ -19,14 +21,17 @@ TEST(GaussSeidelSleSolverTests, GaussSeidelSleSolverBasic) {
     atg_scs::Matrix solution(1, 2);
     atg_scs::Matrix check(1, 2);
     atg_scs::Matrix L(2, 2);
+    atg_scs::Matrix J(2, 2);
     atg_scs::Matrix R(1, 2);
+    atg_scs::Matrix s(1, 2, 1.0);
 
-    L.set(L_data);
+    J.set(L_data);
     R.set(R_data);
 
-    const bool solvable = solver.solve(L, R, nullptr, &solution);
+    const bool solvable = solver.solve(J, s, R, nullptr, &solution);
     EXPECT_TRUE(solvable);
 
+    JWJ_t(J, s, &L);
     L.multiply(solution, &check);
 
     EXPECT_NEAR(check.get(0, 0), R.get(0, 0), 1e-7);
@@ -36,6 +41,8 @@ TEST(GaussSeidelSleSolverTests, GaussSeidelSleSolverBasic) {
     check.destroy();
     L.destroy();
     R.destroy();
+    s.destroy();
+    J.destroy();
 }
 
 TEST(GaussSeidelSleSolverTests, GaussSeidelSleSolver4x4) {
@@ -55,23 +62,28 @@ TEST(GaussSeidelSleSolverTests, GaussSeidelSleSolver4x4) {
     atg_scs::Matrix solution(1, 4);
     atg_scs::Matrix check(1, 4);
     atg_scs::Matrix L(4, 4);
+    atg_scs::Matrix J(4, 4);
     atg_scs::Matrix R(1, 4);
+    atg_scs::Matrix s(1, 4, 1.0);
 
-    L.set(L_data);
+    J.set(L_data);
     R.set(R_data);
 
-    const bool solvable = solver.solve(L, R, nullptr, &solution);
+    const bool solvable = solver.solve(J, s, R, nullptr, &solution);
     EXPECT_TRUE(solvable);
 
+    JWJ_t(J, s, &L);
     L.multiply(solution, &check);
 
-    EXPECT_NEAR(check.get(0, 0), R.get(0, 0), 1e-7);
-    EXPECT_NEAR(check.get(0, 1), R.get(0, 1), 1e-7);
-    EXPECT_NEAR(check.get(0, 2), R.get(0, 2), 1e-7);
-    EXPECT_NEAR(check.get(0, 3), R.get(0, 3), 1e-7);
+    EXPECT_NEAR(check.get(0, 0), R.get(0, 0), 1e-6);
+    EXPECT_NEAR(check.get(0, 1), R.get(0, 1), 1e-6);
+    EXPECT_NEAR(check.get(0, 2), R.get(0, 2), 1e-6);
+    EXPECT_NEAR(check.get(0, 3), R.get(0, 3), 1e-6);
 
     solution.destroy();
     check.destroy();
     L.destroy();
     R.destroy();
+    J.destroy();
+    s.destroy();
 }

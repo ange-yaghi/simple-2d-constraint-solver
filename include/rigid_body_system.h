@@ -80,7 +80,7 @@ namespace atg_scs {
 
                 Matrix reg0, reg1, reg2;
 
-                Matrix right, left;
+                Matrix right;
                 Matrix F_ext, F_C;
 
                 // Results

@@ -10,7 +10,8 @@ namespace atg_scs {
             virtual ~GaussSeidelSleSolver();
 
             virtual bool solve(
-                    Matrix &left,
+                    Matrix &J,
+                    Matrix &W,
                     Matrix &right,
                     Matrix *result,
                     Matrix *previous);
@@ -24,6 +25,10 @@ namespace atg_scs {
                     Matrix &right,
                     Matrix *result,
                     Matrix *previous);
+
+            Matrix m_M;
+            Matrix m_J_T;
+            Matrix m_reg;
     };
 } /* namespace atg_scs */
 

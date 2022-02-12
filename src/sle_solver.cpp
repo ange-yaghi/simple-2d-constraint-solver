@@ -9,20 +9,11 @@ atg_scs::SleSolver::~SleSolver() {
 }
 
 bool atg_scs::SleSolver::solve(
-        Matrix &left,
+        Matrix &J,
+        Matrix &W,
         Matrix &right,
         Matrix *result,
         Matrix *previous)
-{
-    return false;
-}
-
-bool atg_scs::SleSolver::solveOptimized(
-    Matrix &J,
-    Matrix &W,
-    Matrix &right,
-    Matrix *result,
-    Matrix *previous)
 {
     return false;
 }

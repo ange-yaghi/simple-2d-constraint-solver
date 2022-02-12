@@ -123,9 +123,9 @@ void atg_scs::Matrix::leftScale(Matrix &scale, Matrix *target) {
     assert(scale.m_width == 1);
     assert(scale.m_height == m_height);
 
-    target->resize(m_height, m_height);
+    target->resize(m_width, m_height);
 
-    for (int i = 0; i < m_height; ++i) {
+    for (int i = 0; i < m_width; ++i) {
         for (int j = 0; j < m_height; ++j) {
             target->m_matrix[i][j] = scale.m_matrix[i][0] * m_matrix[i][j];
         }
@@ -140,7 +140,7 @@ void atg_scs::Matrix::rightScale(Matrix &scale, Matrix *target) {
 
     for (int i = 0; i < m_height; ++i) {
         for (int j = 0; j < m_height; ++j) {
-            target->m_matrix[i][j] = scale.m_matrix[i][0] * m_matrix[i][j];
+            target->m_matrix[i][j] = scale.m_matrix[j][0] * m_matrix[i][j];
         }
     }
 }

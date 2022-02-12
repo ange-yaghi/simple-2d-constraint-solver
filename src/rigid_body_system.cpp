@@ -204,17 +204,17 @@ void atg_scs::RigidBodySystem::populateSystemState() {
 void atg_scs::RigidBodySystem::populateMassMatrices() {
     const int n = getRigidBodyCount();
 
-    m_iv.M.initialize(3 * n, 3 * n);
-    m_iv.M_inv.initialize(3 * n, 3 * n);
+    m_iv.M.initialize(1, 3 * n);
+    m_iv.M_inv.initialize(1, 3 * n);
 
     for (int i = 0; i < n; ++i) {
-        m_iv.M.set(i * 3 + 0, i * 3 + 0, m_rigidBodies[i]->m);
-        m_iv.M.set(i * 3 + 1, i * 3 + 1, m_rigidBodies[i]->m);
-        m_iv.M.set(i * 3 + 2, i * 3 + 2, m_rigidBodies[i]->I);
+        m_iv.M.set(0, i * 3 + 0, m_rigidBodies[i]->m);
+        m_iv.M.set(0, i * 3 + 1, m_rigidBodies[i]->m);
+        m_iv.M.set(0, i * 3 + 2, m_rigidBodies[i]->I);
 
-        m_iv.M_inv.set(i * 3 + 0, i * 3 + 0, 1 / m_rigidBodies[i]->m);
-        m_iv.M_inv.set(i * 3 + 1, i * 3 + 1, 1 / m_rigidBodies[i]->m);
-        m_iv.M_inv.set(i * 3 + 2, i * 3 + 2, 1 / m_rigidBodies[i]->I);
+        m_iv.M_inv.set(0, i * 3 + 0, 1 / m_rigidBodies[i]->m);
+        m_iv.M_inv.set(0, i * 3 + 1, 1 / m_rigidBodies[i]->m);
+        m_iv.M_inv.set(0, i * 3 + 2, 1 / m_rigidBodies[i]->I);
      }
 }
 
@@ -292,8 +292,6 @@ void atg_scs::RigidBodySystem::processConstraints(
         m_iv.ks.set(0, i, m_iv.ks.get(0, i) * m_iv.C.get(0, i));
     }
 
-    m_iv.J.transpose(&m_iv.J_T);
-
     m_iv.F_ext.initialize(1, 3 * n, 0.0);
     for (int i = 0; i < n; ++i) {
         m_iv.F_ext.set(0, i * 3 + 0, m_state.f_x[i]);
@@ -301,9 +299,8 @@ void atg_scs::RigidBodySystem::processConstraints(
         m_iv.F_ext.set(0, i * 3 + 2, m_state.t[i]);
     }
 
-    m_iv.J.multiply(m_iv.M_inv, &m_iv.reg2);
-    m_iv.reg2.multiply(m_iv.J_T, &m_iv.left);
-    m_iv.reg2.multiply(m_iv.F_ext, &m_iv.reg0);
+    m_iv.F_ext.leftScale(m_iv.M_inv, &m_iv.reg2);
+    m_iv.J.multiply(m_iv.reg2, &m_iv.reg0);
 
     m_iv.J_dot.multiply(m_iv.q_dot, &m_iv.reg2);
     m_iv.reg2.negate(&m_iv.reg1);
@@ -315,16 +312,17 @@ void atg_scs::RigidBodySystem::processConstraints(
     auto s1 = std::chrono::steady_clock::now();
 
     const bool solvable =
-        m_sleSolver->solve(m_iv.left, m_iv.right, &m_iv.lambda, &m_iv.lambda);
+        m_sleSolver->solve(m_iv.J, m_iv.M_inv, m_iv.right, &m_iv.lambda, &m_iv.lambda);
     assert(solvable);
 
     auto s2 = std::chrono::steady_clock::now();
 
+    m_iv.J.transpose(&m_iv.J_T);
     m_iv.J_T.multiply(m_iv.lambda, &m_iv.F_C);
 
     for (int i = 0; i < n; ++i) {
-        const double invMass = m_iv.M_inv.get(i * 3 + 0, i * 3 + 0);
-        const double invInertia = m_iv.M_inv.get(i * 3 + 2, i * 3 + 2);
+        const double invMass = m_iv.M_inv.get(0, i * 3 + 0);
+        const double invInertia = m_iv.M_inv.get(0, i * 3 + 2);
 
         const double F_C_x = (m_f > 0)
             ? m_iv.F_C.get(0, i * 3 + 0)

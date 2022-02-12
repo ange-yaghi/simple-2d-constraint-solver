@@ -6,20 +6,31 @@
 
 atg_scs::GaussianEliminationSleSolver::GaussianEliminationSleSolver() {
     m_a.initialize(1, 1);
+    m_M.initialize(1, 1);
+    m_J_T.initialize(1, 1);
+    m_reg.initialize(1, 1);
 }
 
 atg_scs::GaussianEliminationSleSolver::~GaussianEliminationSleSolver() {
     m_a.destroy();
+    m_M.destroy();
+    m_J_T.destroy();
+    m_reg.destroy();
 }
 
 bool atg_scs::GaussianEliminationSleSolver::solve(
-        Matrix &left,
+        Matrix &J,
+        Matrix &W,
         Matrix &right,
         Matrix *previous,
         Matrix *result)
 {
-    const int n = left.getWidth() + 1;
-    const int m = left.getHeight();
+    J.transpose(&m_J_T);
+    m_J_T.leftScale(W, &m_reg);
+    J.multiply(m_reg, &m_M);
+
+    const int n = m_M.getWidth() + 1;
+    const int m = m_M.getHeight();
 
     if (n == 0 || m == 0) return true;
 
@@ -31,7 +42,7 @@ bool atg_scs::GaussianEliminationSleSolver::solve(
     for (int i = 0; i < m; ++i) {
         A.set(n - 1, i, right.get(0, i));
         for (int j = 0; j < n - 1; ++j) {
-            A.set(j, i, left.get(j, i));
+            A.set(j, i, m_M.get(j, i));
         }
     }
 

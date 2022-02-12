@@ -10,13 +10,17 @@ namespace atg_scs {
             virtual ~GaussianEliminationSleSolver();
 
             virtual bool solve(
-                    Matrix &left,
+                    Matrix &J,
+                    Matrix &W,
                     Matrix &right,
                     Matrix *result,
                     Matrix *previous);
 
         protected:
             Matrix m_a;
+            Matrix m_M;
+            Matrix m_J_T;
+            Matrix m_reg;
     };
 } /* namespace atg_scs */
 

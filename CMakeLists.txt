@@ -80,6 +80,7 @@ add_library(simple-2d-constraint-solver STATIC
 enable_testing()
 
 add_executable(simple-2d-constraint-solver-test
+    # Source files
     test/sanity_tests.cpp
     test/matrix_tests.cpp
     test/euler_ode_solver_tests.cpp
@@ -87,6 +88,10 @@ add_executable(simple-2d-constraint-solver-test
     test/gauss_seidel_sle_solver_tests.cpp
     test/gaussian_elimination_sle_solver_tests.cpp
     test/rolling_constraint_tests.cpp
+    test/utilities.cpp
+
+    # Header files
+    test/utilities.h
 )
 
 target_link_libraries(simple-2d-constraint-solver-test

@@ -1,5 +1,7 @@
 #include <gtest/gtest.h>
 
+#include "utilities.h"
+
 #include "../include/gaussian_elimination_sle_solver.h"
 
 TEST(GaussianEliminationSleSolverTests, GaussianEliminationSleSolverSanity) {
@@ -9,7 +11,7 @@ TEST(GaussianEliminationSleSolverTests, GaussianEliminationSleSolverSanity) {
 TEST(GaussianEliminationSleSolverTests, GaussSeidelSleSolverBasic) {
     atg_scs::GaussianEliminationSleSolver solver;
 
-    const double L_data[] = {
+    const double J_data[] = {
         500.0, 10.0,
         20.0, -600.0 };
     const double R_data[] = {
@@ -18,15 +20,18 @@ TEST(GaussianEliminationSleSolverTests, GaussSeidelSleSolverBasic) {
 
     atg_scs::Matrix solution(1, 2);
     atg_scs::Matrix check(1, 2);
-    atg_scs::Matrix L(2, 2);
+    atg_scs::Matrix J(2, 2);
     atg_scs::Matrix R(1, 2);
+    atg_scs::Matrix s(1, 2, 1.0);
+    atg_scs::Matrix L(2, 2);
 
-    L.set(L_data);
+    J.set(J_data);
     R.set(R_data);
 
-    const bool solvable = solver.solve(L, R, nullptr, &solution);
+    const bool solvable = solver.solve(J, s, R, nullptr, &solution);
     EXPECT_TRUE(solvable);
-
+    
+    JWJ_t(J, s, &L);
     L.multiply(solution, &check);
 
     EXPECT_NEAR(check.get(0, 0), R.get(0, 0), 1e-7);
@@ -34,8 +39,10 @@ TEST(GaussianEliminationSleSolverTests, GaussSeidelSleSolverBasic) {
 
     solution.destroy();
     check.destroy();
-    L.destroy();
+    J.destroy();
     R.destroy();
+    s.destroy();
+    L.destroy();
 }
 
 TEST(GaussianEliminationSleSolverTests, GaussianEliminationSleSolver4x4) {
@@ -54,15 +61,18 @@ TEST(GaussianEliminationSleSolverTests, GaussianEliminationSleSolver4x4) {
 
     atg_scs::Matrix solution(1, 4);
     atg_scs::Matrix check(1, 4);
+    atg_scs::Matrix J(4, 4);
     atg_scs::Matrix L(4, 4);
     atg_scs::Matrix R(1, 4);
+    atg_scs::Matrix s(1, 4, 1.0);
 
-    L.set(L_data);
+    J.set(L_data);
     R.set(R_data);
 
-    const bool solvable = solver.solve(L, R, nullptr, &solution);
+    const bool solvable = solver.solve(J, s, R, nullptr, &solution);
     EXPECT_TRUE(solvable);
 
+    JWJ_t(J, s, &L);
     L.multiply(solution, &check);
 
     EXPECT_NEAR(check.get(0, 0), R.get(0, 0), 1e-7);
@@ -72,6 +82,8 @@ TEST(GaussianEliminationSleSolverTests, GaussianEliminationSleSolver4x4) {
 
     solution.destroy();
     check.destroy();
+    J.destroy();
     L.destroy();
     R.destroy();
+    s.destroy();
 }

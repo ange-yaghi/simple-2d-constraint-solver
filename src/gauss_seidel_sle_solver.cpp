@@ -6,14 +6,21 @@
 atg_scs::GaussSeidelSleSolver::GaussSeidelSleSolver() {
     m_maxIterations = 1000;
     m_minDelta = 1E-10;
+
+    m_M.initialize(1, 1);
+    m_J_T.initialize(1, 1);
+    m_reg.initialize(1, 1);
 }
 
 atg_scs::GaussSeidelSleSolver::~GaussSeidelSleSolver() {
-    /* void */
+    m_M.destroy();
+    m_J_T.destroy();
+    m_reg.destroy();
 }
 
 bool atg_scs::GaussSeidelSleSolver::solve(
-        Matrix &left,
+        Matrix &J,
+        Matrix &W,
         Matrix &right,
         Matrix *previous,
         Matrix *result)
@@ -26,9 +33,13 @@ bool atg_scs::GaussSeidelSleSolver::solve(
         result->set(previous);
     }
 
+    J.transpose(&m_J_T);
+    m_J_T.leftScale(W, &m_reg);
+    J.multiply(m_reg, &m_M);
+
     for (int i = 0; i < m_maxIterations; ++i) {
         const double maxDelta = solveIteration(
-                left,
+                m_M,
                 right,
                 result,
                 result);

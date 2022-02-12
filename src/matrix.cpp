@@ -33,6 +33,11 @@ void atg_scs::Matrix::initialize(int width, int height, double value) {
     }
 }
 
+void atg_scs::Matrix::initialize(int width, int height) {
+    resize(width, height);
+    memset(m_data, 0, sizeof(double) * width * height);
+}
+
 void atg_scs::Matrix::resize(int width, int height) {
     if (width == m_width && height == m_height) return;
     else if (width > m_capacityWidth || height > m_capacityHeight) {
@@ -97,6 +102,23 @@ void atg_scs::Matrix::multiply(Matrix &b, Matrix *target) {
             double v = 0.0;
             for (int ii = 0; ii < m_width; ++ii) {
                 v += m_matrix[i][ii] * b.m_matrix[ii][j];
+            }
+
+            target->m_matrix[i][j] = v;
+        }
+    }
+}
+
+void atg_scs::Matrix::transposeMultiply(Matrix &b, Matrix *target) {
+    assert(m_height == b.m_height);
+
+    target->resize(b.m_width, m_width);
+
+    for (int i = 0; i < m_width; ++i) {
+        for (int j = 0; j < b.m_width; ++j) {
+            double v = 0.0;
+            for (int ii = 0; ii < m_height; ++ii) {
+                v += m_matrix[ii][i] * b.m_matrix[ii][j];
             }
 
             target->m_matrix[i][j] = v;

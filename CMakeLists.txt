@@ -50,6 +50,7 @@ add_library(simple-2d-constraint-solver STATIC
     src/line_constraint.cpp
     src/constant_speed_motor.cpp
     src/rolling_constraint.cpp
+    src/sparse_matrix.cpp
 
     # Header files
     include/rigid_body_system.h
@@ -73,6 +74,7 @@ add_library(simple-2d-constraint-solver STATIC
     include/line_constraint.h
     include/constant_speed_motor.h
     include/rolling_constraint.h
+    include/sparse_matrix.h
 )
 
 # GTEST
@@ -89,6 +91,7 @@ add_executable(simple-2d-constraint-solver-test
     test/gaussian_elimination_sle_solver_tests.cpp
     test/rolling_constraint_tests.cpp
     test/utilities.cpp
+    test/sparse_matrix_tests.cpp
 
     # Header files
     test/utilities.h

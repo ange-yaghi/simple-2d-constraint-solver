@@ -101,3 +101,33 @@ TEST(MatrixTests, MatrixRightScale) {
     result.destroy();
     resultReference.destroy();
 }
+
+TEST(MatrixTests, MatrixTransposeMultiplication) {
+    const double m0_data[] = {
+        0.0, 1.0,
+        -1.0, 0.0 };
+    const double v_data[] = {
+        1.0,
+        2.0 };
+
+    atg_scs::Matrix m0(2, 2);
+    atg_scs::Matrix m0_T(2, 2);
+    atg_scs::Matrix v(1, 2);
+    atg_scs::Matrix resultReference(1, 2);
+    atg_scs::Matrix result(1, 2);
+
+    m0.set(m0_data);
+    v.set(v_data);
+
+    m0.transpose(&m0_T);
+    m0_T.multiply(v, &resultReference);
+    m0.transposeMultiply(v, &result);
+
+    compareMatrix(result, resultReference);
+
+    m0.destroy();
+    v.destroy();
+    result.destroy();
+    resultReference.destroy();
+    m0_T.destroy();
+}

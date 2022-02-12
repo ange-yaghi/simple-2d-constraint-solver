@@ -10,7 +10,8 @@ namespace atg_scs {
             Matrix(int width, int height, double value = 0.0);
             ~Matrix();
 
-            void initialize(int width, int height, double value = 0.0);
+            void initialize(int width, int height, double value);
+            void initialize(int width, int height);
             void resize(int width, int height);
             void destroy();
 
@@ -33,6 +34,7 @@ namespace atg_scs {
             void set(Matrix *reference);
 
             void multiply(Matrix &b, Matrix *target);
+            void transposeMultiply(Matrix &b, Matrix *target);
             void leftScale(Matrix &scale, Matrix *target);
             void rightScale(Matrix &scale, Matrix *target);
             void subtract(Matrix &b, Matrix *target);

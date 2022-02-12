@@ -7,27 +7,23 @@
 atg_scs::GaussianEliminationSleSolver::GaussianEliminationSleSolver() {
     m_a.initialize(1, 1);
     m_M.initialize(1, 1);
-    m_J_T.initialize(1, 1);
-    m_reg.initialize(1, 1);
 }
 
 atg_scs::GaussianEliminationSleSolver::~GaussianEliminationSleSolver() {
     m_a.destroy();
     m_M.destroy();
-    m_J_T.destroy();
     m_reg.destroy();
 }
 
 bool atg_scs::GaussianEliminationSleSolver::solve(
-        Matrix &J,
+        SparseMatrix &J,
         Matrix &W,
         Matrix &right,
         Matrix *previous,
         Matrix *result)
 {
-    J.transpose(&m_J_T);
-    m_J_T.leftScale(W, &m_reg);
-    J.multiply(m_reg, &m_M);
+    J.rightScale(W, &m_reg);
+    m_reg.multiplyTranspose(J, &m_M);
 
     const int n = m_M.getWidth() + 1;
     const int m = m_M.getHeight();

@@ -10,7 +10,7 @@ namespace atg_scs {
             virtual ~GaussianEliminationSleSolver();
 
             virtual bool solve(
-                    Matrix &J,
+                    SparseMatrix &J,
                     Matrix &W,
                     Matrix &right,
                     Matrix *result,
@@ -19,8 +19,7 @@ namespace atg_scs {
         protected:
             Matrix m_a;
             Matrix m_M;
-            Matrix m_J_T;
-            Matrix m_reg;
+            SparseMatrix m_reg;
     };
 } /* namespace atg_scs */
 

@@ -39,6 +39,7 @@ namespace atg_scs {
             void rightScale(Matrix &scale, Matrix *target);
             void subtract(Matrix &b, Matrix *target);
             void negate(Matrix *target);
+            bool equals(Matrix &b, double err = 1e-6);
 
             void transpose(Matrix *target);
             int getWidth() const { return m_width; }

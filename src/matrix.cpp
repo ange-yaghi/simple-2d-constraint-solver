@@ -175,6 +175,21 @@ void atg_scs::Matrix::negate(Matrix *target) {
     }
 }
 
+bool atg_scs::Matrix::equals(Matrix &b, double err) {
+    if (getWidth() != b.getWidth()) return false;
+    if (getHeight() != b.getHeight()) return false;
+
+    for (int i = 0; i < getHeight(); ++i) {
+        for (int j = 0; j < getWidth(); ++j) {
+            if (std::abs(get(j, i) - b.get(j, i)) > err) {
+                return false;
+            }
+        }
+    }
+
+    return true;
+}
+
 void atg_scs::Matrix::transpose(Matrix *target) {
     target->resize(m_height, m_width);
 

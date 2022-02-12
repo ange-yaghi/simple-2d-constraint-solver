@@ -5,6 +5,7 @@
 #include "constraint.h"
 #include "force_generator.h"
 #include "matrix.h"
+#include "sparse_matrix.h"
 #include "sle_solver.h"
 #include "ode_solver.h"
 #include "system_state.h"
@@ -72,6 +73,7 @@ namespace atg_scs {
 
         protected:
             struct IntermediateValues {
+                SparseMatrix J_sparse, J_dot_sparse;
                 Matrix J, J_dot, J_T;
                 Matrix M, M_inv;
                 Matrix C;

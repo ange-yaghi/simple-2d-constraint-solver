@@ -86,7 +86,7 @@ void atg_scs::SparseMatrix::expand(Matrix *matrix) {
             if (block == 0xFF) continue;
             else {
                 for (int k = 0; k < m_stride; ++k) {
-                    matrix->set(block, i, m_matrix[i][j * m_stride + k]);
+                    matrix->set(block * m_stride + k, i, m_matrix[i][j * m_stride + k]);
                 }
             }
         }
@@ -129,7 +129,18 @@ void atg_scs::SparseMatrix::rightScale(Matrix &scale, SparseMatrix *target) {
 
     for (int i = 0; i < m_height; ++i) {
         for (int j = 0; j < m_elementsPerRow; ++j) {
-            target->m_matrix[i][j] = scale.get(0, j) * m_matrix[i][j];
+            const uint8_t index = m_blockData[i * m_elementsPerRow + j];
+            if (index == 0xFF) continue;
+
+            target->setBlock(i, j, index);
+
+            for (int k = 0; k < m_stride; ++k) {
+                target->set(
+                    i,
+                    j,
+                    k,
+                    scale.get(0, index * m_stride + k) * m_matrix[i][j * m_stride + k]);
+            }
         }
     }
 }

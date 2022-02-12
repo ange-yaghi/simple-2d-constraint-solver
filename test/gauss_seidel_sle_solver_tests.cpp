@@ -8,6 +8,7 @@ TEST(GaussSeidelSleSolverTests, GaussSeidelSleSolverSanity) {
     atg_scs::GaussSeidelSleSolver solver;
 }
 
+/*
 TEST(GaussSeidelSleSolverTests, GaussSeidelSleSolverBasic) {
     atg_scs::GaussSeidelSleSolver solver;
 
@@ -87,3 +88,4 @@ TEST(GaussSeidelSleSolverTests, GaussSeidelSleSolver4x4) {
     J.destroy();
     s.destroy();
 }
+*/

@@ -2,6 +2,7 @@
 #define ATG_SIMPLE_2D_CONSTRAINT_SOLVER_SLE_SOLVER_H
 
 #include "matrix.h"
+#include "sparse_matrix.h"
 
 namespace atg_scs {
     class SleSolver {
@@ -10,7 +11,7 @@ namespace atg_scs {
             virtual ~SleSolver();
 
             virtual bool solve(
-                    Matrix &J,
+                    SparseMatrix &J,
                     Matrix &W,
                     Matrix &right,
                     Matrix *result,

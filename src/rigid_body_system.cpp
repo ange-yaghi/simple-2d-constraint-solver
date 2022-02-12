@@ -253,8 +253,8 @@ void atg_scs::RigidBodySystem::processConstraints(
         m_iv.q_dot.set(0, i * 3 + 2, m_state.v_theta[i]);
     }
 
-    m_iv.J.initialize(3 * n, m_f, 0.0);
-    m_iv.J_dot.initialize(3 * n, m_f, 0.0);
+    m_iv.J_sparse.initialize(3 * n, m_f, 3, 2);
+    m_iv.J_dot_sparse.initialize(3 * n, m_f, 3, 2);
     m_iv.ks.initialize(1, m_f, 0.0);
     m_iv.kd.initialize(1, m_f, 0.0);
     m_iv.C.initialize(1, m_f, 0.0);
@@ -266,15 +266,24 @@ void atg_scs::RigidBodySystem::processConstraints(
         const int c_n = m_constraints[j]->getConstraintCount();
 
         for (int k = 0; k < c_n; ++k) {
+            for (int i = 0; i < m_constraints[j]->m_bodyCount; ++i) {
+                const int index = m_constraints[j]->m_bodies[i]->index;
+
+                if (index == -1) continue;
+
+                m_iv.J_sparse.setBlock(c_i + k, i, index);
+                m_iv.J_dot_sparse.setBlock(c_i + k, i, index);
+            }
+
             for (int i = 0; i < m_constraints[j]->m_bodyCount * 3; ++i) {
                 const int index = m_constraints[j]->m_bodies[i / 3]->index;
 
                 if (index == -1) continue;
 
-                m_iv.J.set(index * 3 + (i % 3), c_i + k,
+                m_iv.J_sparse.set(c_i + k, i / 3, i % 3,
                         constraintOutput.J[k][i]);
 
-                m_iv.J_dot.set(index * 3 + (i % 3), c_i + k,
+                m_iv.J_dot_sparse.set(c_i + k, i / 3, i % 3,
                         constraintOutput.J_dot[k][i]);
 
                 m_iv.ks.set(0, c_i + k, constraintOutput.ks[k]);
@@ -285,6 +294,9 @@ void atg_scs::RigidBodySystem::processConstraints(
 
         c_i += c_n;
     }
+
+    m_iv.J_sparse.expand(&m_iv.J);
+    m_iv.J_dot_sparse.expand(&m_iv.J_dot);
 
     m_iv.J.multiply(m_iv.q_dot, &m_iv.reg0);
     for (int i = 0; i < m_f; ++i) {
@@ -312,7 +324,7 @@ void atg_scs::RigidBodySystem::processConstraints(
     auto s1 = std::chrono::steady_clock::now();
 
     const bool solvable =
-        m_sleSolver->solve(m_iv.J, m_iv.M_inv, m_iv.right, &m_iv.lambda, &m_iv.lambda);
+        m_sleSolver->solve(m_iv.J_sparse, m_iv.M_inv, m_iv.right, &m_iv.lambda, &m_iv.lambda);
     assert(solvable);
 
     auto s2 = std::chrono::steady_clock::now();

@@ -1,6 +1,8 @@
 #ifndef ATG_SIMPLE_2D_CONSTRAINT_SOLVER_MATRIX_H
 #define ATG_SIMPLE_2D_CONSTRAINT_SOLVER_MATRIX_H
 
+#include <assert.h>
+
 namespace atg_scs {
     class Matrix {
         public:
@@ -11,9 +13,22 @@ namespace atg_scs {
             void initialize(int width, int height, double value = 0.0);
             void resize(int width, int height);
             void destroy();
-            void set(int column, int row, double value);
+
             void set(const double *data);
-            double get(int column, int row);
+
+            __forceinline void set(int column, int row, double value) {
+                assert(column >= 0 && column < m_width);
+                assert(row >= 0 && row < m_height);
+
+                m_matrix[row][column] = value;
+            }
+
+            __forceinline double get(int column, int row) {
+                assert(column >= 0 && column < m_width);
+                assert(row >= 0 && row < m_height);
+
+                return m_matrix[row][column];
+            }
 
             void set(Matrix *reference);
 

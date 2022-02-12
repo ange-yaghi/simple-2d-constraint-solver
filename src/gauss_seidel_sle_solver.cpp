@@ -4,7 +4,7 @@
 #include <assert.h>
 
 atg_scs::GaussSeidelSleSolver::GaussSeidelSleSolver() {
-    m_maxIterations = 1000;
+    m_maxIterations = 40;
     m_minDelta = 1E-10;
 
     m_M.initialize(1, 1);
@@ -74,7 +74,9 @@ double atg_scs::GaussSeidelSleSolver::solveIteration(
         const double k_next_i =
             (1 / left.get(i, i)) * (right.get(0, i) - s0 - s1);
         const double delta = std::abs(k->get(0, i) - k_next_i);
-        maxDifference = std::fmax(delta, maxDifference);
+        maxDifference = (delta > maxDifference)
+            ? delta
+            : maxDifference;
 
         k_next->set(0, i, k_next_i);
     }

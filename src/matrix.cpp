@@ -1,5 +1,6 @@
 #include "../include/matrix.h"
 
+#include <algorithm>
 #include <assert.h>
 
 atg_scs::Matrix::Matrix() {
@@ -72,24 +73,8 @@ void atg_scs::Matrix::destroy() {
     m_capacityWidth = m_capacityHeight = 0;
 }
 
-void atg_scs::Matrix::set(int column, int row, double value) {
-    assert(column >= 0 && column < m_width);
-    assert(row >= 0 && row < m_height);
-
-    m_matrix[row][column] = value;
-}
-
 void atg_scs::Matrix::set(const double *data) {
-    for (int i = 0; i < m_width * m_height; ++i) {
-        m_data[i] = data[i];
-    }
-}
-
-double atg_scs::Matrix::get(int column, int row) {
-    assert(column >= 0 && column < m_width);
-    assert(row >= 0 && row < m_height);
-
-    return m_matrix[row][column];
+    memcpy(m_data, data, sizeof(double) * m_width * m_height);
 }
 
 void atg_scs::Matrix::set(Matrix *reference) {
@@ -125,8 +110,8 @@ void atg_scs::Matrix::leftScale(Matrix &scale, Matrix *target) {
 
     target->resize(m_width, m_height);
 
-    for (int i = 0; i < m_width; ++i) {
-        for (int j = 0; j < m_height; ++j) {
+    for (int i = 0; i < m_height; ++i) {
+        for (int j = 0; j < m_width; ++j) {
             target->m_matrix[i][j] = scale.m_matrix[i][0] * m_matrix[i][j];
         }
     }
@@ -134,12 +119,12 @@ void atg_scs::Matrix::leftScale(Matrix &scale, Matrix *target) {
 
 void atg_scs::Matrix::rightScale(Matrix &scale, Matrix *target) {
     assert(scale.m_width == 1);
-    assert(scale.m_height == m_height);
+    assert(scale.m_height == m_width);
 
-    target->resize(m_height, m_height);
+    target->resize(m_width, m_height);
 
     for (int i = 0; i < m_height; ++i) {
-        for (int j = 0; j < m_height; ++j) {
+        for (int j = 0; j < m_width; ++j) {
             target->m_matrix[i][j] = scale.m_matrix[j][0] * m_matrix[i][j];
         }
     }

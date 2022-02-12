@@ -2,16 +2,16 @@
 
 #include "utilities.h"
 
-#include "../include/gauss_seidel_sle_solver.h"
+#include "../include/gaussian_elimination_sle_solver.h"
 
-TEST(GaussSeidelSleSolverTests, GaussSeidelSleSolverSanity) {
-    atg_scs::GaussSeidelSleSolver solver;
+TEST(GaussianEliminationSleSolverTests, GaussianEliminationSleSolverSanity) {
+    atg_scs::GaussianEliminationSleSolver solver;
 }
 
-TEST(GaussSeidelSleSolverTests, GaussSeidelSleSolverBasic) {
-    atg_scs::GaussSeidelSleSolver solver;
+TEST(GaussianEliminationSleSolverTests, GaussSeidelSleSolverBasic) {
+    atg_scs::GaussianEliminationSleSolver solver;
 
-    const double L_data[] = {
+    const double J_data[] = {
         500.0, 10.0,
         20.0, -600.0 };
     const double R_data[] = {
@@ -20,17 +20,17 @@ TEST(GaussSeidelSleSolverTests, GaussSeidelSleSolverBasic) {
 
     atg_scs::Matrix solution(1, 2);
     atg_scs::Matrix check(1, 2);
-    atg_scs::Matrix L(2, 2);
     atg_scs::Matrix J(2, 2);
     atg_scs::Matrix R(1, 2);
     atg_scs::Matrix s(1, 2, 1.0);
+    atg_scs::Matrix L(2, 2);
 
-    J.set(L_data);
+    J.set(J_data);
     R.set(R_data);
 
     const bool solvable = solver.solve(J, s, R, nullptr, &solution);
     EXPECT_TRUE(solvable);
-
+    
     JWJ_t(J, s, &L);
     L.multiply(solution, &check);
 
@@ -39,14 +39,14 @@ TEST(GaussSeidelSleSolverTests, GaussSeidelSleSolverBasic) {
 
     solution.destroy();
     check.destroy();
-    L.destroy();
+    J.destroy();
     R.destroy();
     s.destroy();
-    J.destroy();
+    L.destroy();
 }
 
-TEST(GaussSeidelSleSolverTests, GaussSeidelSleSolver4x4) {
-    atg_scs::GaussSeidelSleSolver solver;
+TEST(GaussianEliminationSleSolverTests, GaussianEliminationSleSolver4x4) {
+    atg_scs::GaussianEliminationSleSolver solver;
 
     const double L_data[] = {
         500.0, 2.0, 3.0, 4.0,
@@ -61,8 +61,8 @@ TEST(GaussSeidelSleSolverTests, GaussSeidelSleSolver4x4) {
 
     atg_scs::Matrix solution(1, 4);
     atg_scs::Matrix check(1, 4);
-    atg_scs::Matrix L(4, 4);
     atg_scs::Matrix J(4, 4);
+    atg_scs::Matrix L(4, 4);
     atg_scs::Matrix R(1, 4);
     atg_scs::Matrix s(1, 4, 1.0);
 
@@ -75,15 +75,15 @@ TEST(GaussSeidelSleSolverTests, GaussSeidelSleSolver4x4) {
     JWJ_t(J, s, &L);
     L.multiply(solution, &check);
 
-    EXPECT_NEAR(check.get(0, 0), R.get(0, 0), 1e-6);
-    EXPECT_NEAR(check.get(0, 1), R.get(0, 1), 1e-6);
-    EXPECT_NEAR(check.get(0, 2), R.get(0, 2), 1e-6);
-    EXPECT_NEAR(check.get(0, 3), R.get(0, 3), 1e-6);
+    EXPECT_NEAR(check.get(0, 0), R.get(0, 0), 1e-7);
+    EXPECT_NEAR(check.get(0, 1), R.get(0, 1), 1e-7);
+    EXPECT_NEAR(check.get(0, 2), R.get(0, 2), 1e-7);
+    EXPECT_NEAR(check.get(0, 3), R.get(0, 3), 1e-7);
 
     solution.destroy();
     check.destroy();
+    J.destroy();
     L.destroy();
     R.destroy();
-    J.destroy();
     s.destroy();
 }

@@ -301,18 +301,16 @@ void atg_scs::RigidBodySystem::processConstraints(
         m_iv.F_ext.set(0, i * 3 + 2, m_state.t[i]);
     }
 
-    m_iv.J.multiply(m_iv.M_inv, &m_iv.reg0);
-    m_iv.reg0.multiply(m_iv.J_T, &m_iv.left);
-
-    m_iv.J_dot.multiply(m_iv.q_dot, &m_iv.reg0);
-    m_iv.reg0.negate(&m_iv.reg1);
-
     m_iv.J.multiply(m_iv.M_inv, &m_iv.reg2);
+    m_iv.reg2.multiply(m_iv.J_T, &m_iv.left);
     m_iv.reg2.multiply(m_iv.F_ext, &m_iv.reg0);
 
+    m_iv.J_dot.multiply(m_iv.q_dot, &m_iv.reg2);
+    m_iv.reg2.negate(&m_iv.reg1);
+
     m_iv.reg1.subtract(m_iv.reg0, &m_iv.reg2);
-    m_iv.reg2.subtract(m_iv.ks, &m_iv.reg1);
-    m_iv.reg1.subtract(m_iv.kd, &m_iv.right);
+    m_iv.reg2.subtract(m_iv.ks, &m_iv.reg0);
+    m_iv.reg0.subtract(m_iv.kd, &m_iv.right);
 
     auto s1 = std::chrono::steady_clock::now();
 

@@ -14,6 +14,12 @@ namespace atg_scs {
                     Matrix &right,
                     Matrix *result,
                     Matrix *previous);
+            virtual bool solveOptimized(
+                Matrix &J,
+                Matrix &W,
+                Matrix &right,
+                Matrix *result,
+                Matrix *previous);
     };
 } /* namespace atg_scs */
 

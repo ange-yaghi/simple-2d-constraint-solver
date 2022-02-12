@@ -18,6 +18,8 @@ namespace atg_scs {
             void set(Matrix *reference);
 
             void multiply(Matrix &b, Matrix *target);
+            void leftScale(Matrix &scale, Matrix *target);
+            void rightScale(Matrix &scale, Matrix *target);
             void subtract(Matrix &b, Matrix *target);
             void negate(Matrix *target);
 

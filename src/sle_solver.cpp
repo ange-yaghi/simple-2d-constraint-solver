@@ -16,3 +16,13 @@ bool atg_scs::SleSolver::solve(
 {
     return false;
 }
+
+bool atg_scs::SleSolver::solveOptimized(
+    Matrix &J,
+    Matrix &W,
+    Matrix &right,
+    Matrix *result,
+    Matrix *previous)
+{
+    return false;
+}

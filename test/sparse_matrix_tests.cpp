@@ -13,11 +13,11 @@ TEST(SparseMatrixTests, MatrixTransposeMultiplication) {
 
     atg_scs::Matrix m(3, 3);
     atg_scs::Matrix m_T(3, 3);
-    atg_scs::SparseMatrix s;
+    atg_scs::SparseMatrix<1> s;
     atg_scs::Matrix resultReference(3, 3);
     atg_scs::Matrix result(3, 3);
 
-    s.initialize(3, 3, 1, 2);
+    s.initialize(3, 3);
     s.setBlock(0, 0, 1);
     s.setBlock(0, 1, 2);
     s.setBlock(1, 0, 0);
@@ -54,11 +54,11 @@ TEST(SparseMatrixTests, MatrixTransposeMultiplicationStride2) {
 
     atg_scs::Matrix m(6, 3);
     atg_scs::Matrix m_T;
-    atg_scs::SparseMatrix s;
+    atg_scs::SparseMatrix<3> s;
     atg_scs::Matrix resultReference(3, 3);
     atg_scs::Matrix result(3, 3);
 
-    s.initialize(6, 3, 2, 2);
+    s.initialize(6, 3);
     s.setBlock(0, 0, 1);
     s.setBlock(0, 1, 2);
     s.setBlock(1, 0, 0);
@@ -108,12 +108,12 @@ TEST(SparseMatrixTests, RightScale) {
 
     atg_scs::Matrix m(3, 3);
     atg_scs::Matrix scale(1, 3);
-    atg_scs::SparseMatrix s;
-    atg_scs::SparseMatrix s_scaled;
+    atg_scs::SparseMatrix<1> s;
+    atg_scs::SparseMatrix<1> s_scaled;
     atg_scs::Matrix resultReference(3, 3);
     atg_scs::Matrix result(3, 3);
 
-    s.initialize(3, 3, 1, 2);
+    s.initialize(3, 3);
     s.setBlock(0, 0, 1);
     s.setBlock(0, 1, 2);
     s.setBlock(1, 0, 0);
@@ -158,12 +158,12 @@ TEST(SparseMatrixTests, RightScaleStride2) {
 
     atg_scs::Matrix m(6, 3);
     atg_scs::Matrix scale(1, 6);
-    atg_scs::SparseMatrix s;
-    atg_scs::SparseMatrix s_scaled;
+    atg_scs::SparseMatrix<2> s;
+    atg_scs::SparseMatrix<2> s_scaled;
     atg_scs::Matrix resultReference(3, 3);
     atg_scs::Matrix result(3, 3);
 
-    s.initialize(6, 3, 2, 2);
+    s.initialize(6, 3);
     s.setBlock(0, 0, 1);
     s.setBlock(0, 1, 2);
     s.setBlock(1, 0, 0);

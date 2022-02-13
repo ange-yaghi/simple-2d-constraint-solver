@@ -15,8 +15,14 @@ atg_scs::GaussianEliminationSleSolver::~GaussianEliminationSleSolver() {
     m_reg.destroy();
 }
 
+double fastAbs(double v) {
+    return (v > 0)
+        ? v
+        : -1;
+}
+
 bool atg_scs::GaussianEliminationSleSolver::solve(
-        SparseMatrix &J,
+        SparseMatrix<3> &J,
         Matrix &W,
         Matrix &right,
         Matrix *previous,
@@ -28,6 +34,8 @@ bool atg_scs::GaussianEliminationSleSolver::solve(
     const int n = m_M.getWidth() + 1;
     const int m = m_M.getHeight();
 
+    assert(right.getHeight() == m_M.getWidth());
+
     if (n == 0 || m == 0) return true;
 
     result->resize(1, m);
@@ -36,22 +44,25 @@ bool atg_scs::GaussianEliminationSleSolver::solve(
     A.resize(n, m);
 
     for (int i = 0; i < m; ++i) {
-        A.set(n - 1, i, right.get(0, i));
         for (int j = 0; j < n - 1; ++j) {
             A.set(j, i, m_M.get(j, i));
         }
+        A.set(n - 1, i, right.get(0, i));
     }
 
     int h = 0, k = 0;
     while (h < m && k < n) {
         int i_max = h;
+        double maxV = fastAbs(A.get(k, i_max));
         for (int i = h + 1; i < m; ++i) {
-            if (std::abs(A.get(k, i)) > std::abs(A.get(k, i_max))) {
+            const double v = fastAbs(A.get(k, i));
+            if (v > maxV) {
+                maxV = v;
                 i_max = i;
             }
         }
 
-        if (A.get(k, i_max) == 0) {
+        if (maxV == 0) {
             ++k;
         }
         else {

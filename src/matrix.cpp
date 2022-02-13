@@ -199,9 +199,3 @@ void atg_scs::Matrix::transpose(Matrix *target) {
         }
     }
 }
-
-void atg_scs::Matrix::fastRowSwap(int a, int b) {
-    double *temp = m_matrix[a];
-    m_matrix[a] = m_matrix[b];
-    m_matrix[b] = temp;
-}

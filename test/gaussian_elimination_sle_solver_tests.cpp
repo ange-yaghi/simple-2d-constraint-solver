@@ -12,28 +12,24 @@ TEST(GaussianEliminationSleSolverTests, GaussianEliminationSleSolverBasic) {
     atg_scs::GaussianEliminationSleSolver solver;
 
     const double J_data[] = {
-        500.0, 0.0,
-        0.0, -600.0 };
+        500.0, 0.0, 2.0,
+        0.0, -600.0, 1.0 };
     const double R_data[] = {
         50.0,
         100.0 };
 
     atg_scs::Matrix solution(1, 2);
     atg_scs::Matrix check(1, 2);
-    atg_scs::SparseMatrix J;
-    atg_scs::Matrix J_mat(2, 2);
+    atg_scs::SparseMatrix<3, 2> J;
+    atg_scs::Matrix J_mat(3, 2);
     atg_scs::Matrix R(1, 2);
-    atg_scs::Matrix s(1, 2, 1.0);
+    atg_scs::Matrix s(1, 3, 1.0);
     atg_scs::Matrix L(2, 2);
-
-    J.initialize(2, 2, 1, 1);
-    J.setBlock(0, 0, 0);
-    J.setBlock(1, 0, 1);
-    J.set(0, 0, 0, 500.0);
-    J.set(1, 0, 0, -600.0);
 
     J_mat.set(J_data);
     R.set(R_data);
+
+    fullToSparse(J_mat, &J, 3);
 
     const bool solvable = solver.solve(J, s, R, nullptr, &solution);
     EXPECT_TRUE(solvable);
@@ -57,29 +53,29 @@ TEST(GaussianEliminationSleSolverTests, GaussianEliminationSleSolver4x4) {
     atg_scs::GaussianEliminationSleSolver solver;
 
     const double L_data[] = {
-        500.0, 2.0, 0.0, 0.0,
-        5.0, -700.0, 45.0, 10.0,
-        0.0, 5.0, 200.0, 5.0,
-        10.0, 20.0, 30.0, 500.0 };
+        500.0, 2.0, 4.0, 0.0, 0.0, 0.0,
+        5.0, -700.0, 10.0, 45.0, 10.0, 20.0,
+        0.0, 5.0, 10.0, 200.0, 5.0, 5.0,
+        10.0, 20.0, -10.0, 30.0, 500.0, 300.0 };
     const double R_data[] = {
         5.0,
         10.0,
         -1.0,
         20.0 };
 
-    atg_scs::Matrix solution(1, 4);
-    atg_scs::Matrix check(1, 4);
-    atg_scs::Matrix J(4, 4), JW, J_T;
-    atg_scs::SparseMatrix J_sparse, JW_sparse;
-    atg_scs::Matrix L(4, 4);
+    atg_scs::Matrix solution(1, 6);
+    atg_scs::Matrix check(1, 6);
+    atg_scs::Matrix J(6, 4), JW, J_T;
+    atg_scs::SparseMatrix<3, 2> J_sparse, JW_sparse;
+    atg_scs::Matrix L(6, 4);
     atg_scs::Matrix R(1, 4);
-    atg_scs::Matrix s(1, 4, 1.0);
+    atg_scs::Matrix s(1, 6, 1.0);
     atg_scs::Matrix temp;
 
     J.set(L_data);
     R.set(R_data);
 
-    fullToSparse(J, &J_sparse, 2);
+    fullToSparse(J, &J_sparse, 3);
     J_sparse.expand(&temp);
     compareMatrix(temp, J);
 
@@ -98,10 +94,7 @@ TEST(GaussianEliminationSleSolverTests, GaussianEliminationSleSolver4x4) {
 
     L.multiply(solution, &check);
 
-    EXPECT_NEAR(check.get(0, 0), R.get(0, 0), 1e-7);
-    EXPECT_NEAR(check.get(0, 1), R.get(0, 1), 1e-7);
-    EXPECT_NEAR(check.get(0, 2), R.get(0, 2), 1e-7);
-    EXPECT_NEAR(check.get(0, 3), R.get(0, 3), 1e-7);
+    compareMatrix(check, R);
 
     solution.destroy();
     check.destroy();

@@ -13,9 +13,9 @@ void compareMatrix(atg_scs::Matrix &a, atg_scs::Matrix &b, double err) {
     }
 }
 
-void fullToSparse(atg_scs::Matrix &full, atg_scs::SparseMatrix *target, int stride) {
+void fullToSparse(atg_scs::Matrix &full, atg_scs::SparseMatrix<3, 2> *target, int stride) {
     const int entries = full.getWidth() / stride;
-    target->initialize(full.getWidth(), full.getHeight(), stride, entries);
+    target->initialize(full.getWidth(), full.getHeight());
 
     for (int i = 0; i < full.getHeight(); ++i) {
         int currentEntry = 0;

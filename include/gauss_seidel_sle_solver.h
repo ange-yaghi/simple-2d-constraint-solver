@@ -10,7 +10,7 @@ namespace atg_scs {
             virtual ~GaussSeidelSleSolver();
 
             virtual bool solve(
-                    SparseMatrix &J,
+                    SparseMatrix<3> &J,
                     Matrix &W,
                     Matrix &right,
                     Matrix *result,
@@ -27,7 +27,7 @@ namespace atg_scs {
                     Matrix *previous);
 
             Matrix m_M;
-            SparseMatrix m_reg;
+            SparseMatrix<3> m_reg;
     };
 } /* namespace atg_scs */
 

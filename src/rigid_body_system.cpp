@@ -8,10 +8,10 @@ atg_scs::RigidBodySystem::RigidBodySystem() {
     m_sleSolver = nullptr;
     m_odeSolver = nullptr;
 
-    m_odeSolveMicroseconds = new int[ProfilingSamples];
-    m_constraintSolveMicroseconds = new int[ProfilingSamples];
-    m_forceEvalMicroseconds = new int[ProfilingSamples];
-    m_constraintEvalMicroseconds = new int[ProfilingSamples];
+    m_odeSolveMicroseconds = new long long[ProfilingSamples];
+    m_constraintSolveMicroseconds = new long long[ProfilingSamples];
+    m_forceEvalMicroseconds = new long long[ProfilingSamples];
+    m_constraintEvalMicroseconds = new long long[ProfilingSamples];
     m_frameIndex = 0;
 
     for (int i = 0; i < ProfilingSamples; ++i) {
@@ -81,7 +81,7 @@ void atg_scs::RigidBodySystem::removeForceGenerator(ForceGenerator *forceGenerat
 void atg_scs::RigidBodySystem::process(double dt, int steps) {
     const int n = getRigidBodyCount();
 
-    int
+    long long
         odeSolveTime = 0,
         constraintSolveTime = 0,
         forceEvalTime = 0,
@@ -96,7 +96,7 @@ void atg_scs::RigidBodySystem::process(double dt, int steps) {
         while (true) {
             const bool done = m_odeSolver->step(&m_state);
 
-            int evalTime = 0, solveTime = 0;
+            long long evalTime = 0, solveTime = 0;
 
             auto s0 = std::chrono::steady_clock::now();
             processForces();
@@ -148,8 +148,8 @@ int atg_scs::RigidBodySystem::getFullConstraintCount() const {
     return count;
 }
 
-float atg_scs::RigidBodySystem::findAverage(int *samples) {
-    int accum = 0;
+float atg_scs::RigidBodySystem::findAverage(long long *samples) {
+    long long accum = 0;
     int count = 0;
     for (int i = 0; i < ProfilingSamples; ++i) {
         if (samples[i] != -1) {
@@ -234,8 +234,8 @@ void atg_scs::RigidBodySystem::processForces() {
 }
 
 void atg_scs::RigidBodySystem::processConstraints(
-    int *evalTime,
-    int *solveTime)
+        long long *evalTime,
+        long long *solveTime)
 {
     *evalTime = -1;
     *solveTime = -1;
@@ -253,8 +253,8 @@ void atg_scs::RigidBodySystem::processConstraints(
         m_iv.q_dot.set(0, i * 3 + 2, m_state.v_theta[i]);
     }
 
-    m_iv.J_sparse.initialize(3 * n, m_f, 3, 2);
-    m_iv.J_dot_sparse.initialize(3 * n, m_f, 3, 2);
+    m_iv.J_sparse.initialize(3 * n, m_f);
+    m_iv.J_dot_sparse.initialize(3 * n, m_f);
     m_iv.ks.initialize(1, m_f, 0.0);
     m_iv.kd.initialize(1, m_f, 0.0);
     m_iv.C.initialize(1, m_f, 0.0);

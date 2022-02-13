@@ -9,7 +9,7 @@ atg_scs::SleSolver::~SleSolver() {
 }
 
 bool atg_scs::SleSolver::solve(
-        SparseMatrix &J,
+        SparseMatrix<3> &J,
         Matrix &W,
         Matrix &right,
         Matrix *result,

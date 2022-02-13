@@ -48,12 +48,12 @@ namespace atg_scs {
             float getConstraintEvalMicroseconds() const;
 
         protected:
-            static float findAverage(int *samplse);
+            static float findAverage(long long *samples);
 
             void populateSystemState();
             void populateMassMatrices();
             void processForces();
-            void processConstraints(int *evalTime, int *solveTime);
+            void processConstraints(long long *evalTime, long long *solveTime);
 
         protected:
             std::vector<RigidBody *> m_rigidBodies;
@@ -65,15 +65,15 @@ namespace atg_scs {
 
             SystemState m_state;
 
-            int *m_odeSolveMicroseconds;
-            int *m_constraintSolveMicroseconds;
-            int *m_forceEvalMicroseconds;
-            int *m_constraintEvalMicroseconds;
-            int m_frameIndex;
+            long long *m_odeSolveMicroseconds;
+            long long *m_constraintSolveMicroseconds;
+            long long *m_forceEvalMicroseconds;
+            long long *m_constraintEvalMicroseconds;
+            long long m_frameIndex;
 
         protected:
             struct IntermediateValues {
-                SparseMatrix J_sparse, J_dot_sparse;
+                SparseMatrix<3> J_sparse, J_dot_sparse;
                 Matrix J, J_dot, J_T;
                 Matrix M, M_inv;
                 Matrix C;

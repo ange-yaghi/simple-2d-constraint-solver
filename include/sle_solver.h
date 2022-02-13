@@ -11,7 +11,7 @@ namespace atg_scs {
             virtual ~SleSolver();
 
             virtual bool solve(
-                    SparseMatrix &J,
+                    SparseMatrix<3> &J,
                     Matrix &W,
                     Matrix &right,
                     Matrix *result,

@@ -16,7 +16,7 @@ atg_scs::GaussSeidelSleSolver::~GaussSeidelSleSolver() {
 }
 
 bool atg_scs::GaussSeidelSleSolver::solve(
-        SparseMatrix &J,
+        SparseMatrix<3> &J,
         Matrix &W,
         Matrix &right,
         Matrix *previous,

@@ -45,7 +45,11 @@ namespace atg_scs {
             int getWidth() const { return m_width; }
             int getHeight() const { return m_height; }
 
-            void fastRowSwap(int a, int b);
+            __forceinline void fastRowSwap(int a, int b) {
+                double *temp = m_matrix[a];
+                m_matrix[a] = m_matrix[b];
+                m_matrix[b] = temp;
+            }
 
         protected:
             double **m_matrix;

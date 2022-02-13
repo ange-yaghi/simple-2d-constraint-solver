@@ -255,9 +255,9 @@ void atg_scs::RigidBodySystem::processConstraints(
 
     m_iv.J_sparse.initialize(3 * n, m_f);
     m_iv.J_dot_sparse.initialize(3 * n, m_f);
-    m_iv.ks.initialize(1, m_f, 0.0);
-    m_iv.kd.initialize(1, m_f, 0.0);
-    m_iv.C.initialize(1, m_f, 0.0);
+    m_iv.ks.initialize(1, m_f);
+    m_iv.kd.initialize(1, m_f);
+    m_iv.C.initialize(1, m_f);
 
     Constraint::Output constraintOutput;
     int c_i = 0;
@@ -295,10 +295,7 @@ void atg_scs::RigidBodySystem::processConstraints(
         c_i += c_n;
     }
 
-    m_iv.J_sparse.expand(&m_iv.J);
-    m_iv.J_dot_sparse.expand(&m_iv.J_dot);
-
-    m_iv.J.multiply(m_iv.q_dot, &m_iv.reg0);
+    m_iv.J_sparse.multiply(m_iv.q_dot, &m_iv.reg0);
     for (int i = 0; i < m_f; ++i) {
         m_iv.kd.set(0, i, m_iv.kd.get(0, i) * m_iv.reg0.get(0, i));
         m_iv.ks.set(0, i, m_iv.ks.get(0, i) * m_iv.C.get(0, i));
@@ -312,9 +309,9 @@ void atg_scs::RigidBodySystem::processConstraints(
     }
 
     m_iv.F_ext.leftScale(m_iv.M_inv, &m_iv.reg2);
-    m_iv.J.multiply(m_iv.reg2, &m_iv.reg0);
+    m_iv.J_sparse.multiply(m_iv.reg2, &m_iv.reg0);
 
-    m_iv.J_dot.multiply(m_iv.q_dot, &m_iv.reg2);
+    m_iv.J_dot_sparse.multiply(m_iv.q_dot, &m_iv.reg2);
     m_iv.reg2.negate(&m_iv.reg1);
 
     m_iv.reg1.subtract(m_iv.reg0, &m_iv.reg2);
@@ -329,7 +326,7 @@ void atg_scs::RigidBodySystem::processConstraints(
 
     auto s2 = std::chrono::steady_clock::now();
 
-    m_iv.J.transpose(&m_iv.J_T);
+    m_iv.J_sparse.expandTransposed(&m_iv.J_T);
     m_iv.J_T.multiply(m_iv.lambda, &m_iv.F_C);
 
     for (int i = 0; i < n; ++i) {

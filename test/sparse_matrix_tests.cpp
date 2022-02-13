@@ -201,3 +201,39 @@ TEST(SparseMatrixTests, RightScaleStride2) {
     result.destroy();
     resultReference.destroy();
 }
+
+TEST(SparseMatrixTests, SparseMultiplyingFullMatrix) {
+    const double m_data[] = {
+        0.0, 0.0, 1.0, 2.0, 2.0, 3.0,
+        -1.0, -2.0, 0.0, 0.0, 5.0, 6.0,
+        4.0, 5.0, 2.0, 3.0, 0.0, 0.0 };
+    const double vectorData[] = {
+        1.0,
+        -1.0,
+        3.0,
+        4.0,
+        10.0,
+        11.0 };
+
+    atg_scs::Matrix m(6, 3);
+    atg_scs::Matrix v(1, 6);
+    atg_scs::SparseMatrix<3> s;
+    atg_scs::Matrix resultReference(1, 3);
+    atg_scs::Matrix result(1, 3);
+
+    m.set(m_data);
+    v.set(vectorData);
+
+    fullToSparse(m, &s, 3);
+
+    m.multiply(v, &resultReference);
+    s.multiply(v, &result);
+
+    compareMatrix(result, resultReference);
+
+    m.destroy();
+    v.destroy();
+    s.destroy();
+    result.destroy();
+    resultReference.destroy();
+}

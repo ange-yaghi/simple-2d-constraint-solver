@@ -3,6 +3,7 @@
 
 #include <assert.h>
 #include <stdint.h>
+#include <string.h>
 
 namespace atg_scs {
     class Matrix;
@@ -26,12 +27,7 @@ namespace atg_scs {
 
             void initialize(int width, int height) {
                 resize(width, height);
-
-                for (int i = 0; i < height; ++i) {
-                    for (int j = 0; j < T_Entries; ++j) {
-                        setEmpty(i, j);
-                    }
-                }
+                memset(m_blockData, 0xFFFFFF, sizeof(uint8_t) * T_Entries * m_height);
             }
 
             void resize(int width, int height) {
@@ -88,6 +84,22 @@ namespace atg_scs {
                 }
             }
 
+            void expandTransposed(Matrix *matrix) {
+                matrix->initialize(m_height, m_width);
+
+                for (int i = 0; i < m_height; ++i) {
+                    for (int j = 0; j < T_Entries; ++j) {
+                        const uint8_t block = m_blockData[i * T_Entries + j];
+                        if (block == 0xFF) continue;
+                        else {
+                            for (int k = 0; k < T_Stride; ++k) {
+                                matrix->set(i, block * T_Stride + k, m_matrix[i][j * T_Stride + k]);
+                            }
+                        }
+                    }
+                }
+            }
+
             inline void setBlock(int row, int entry, uint8_t index) {
                 assert(row >= 0 && row < m_height);
                 assert(entry >= 0 && entry < T_Entries);
@@ -124,6 +136,8 @@ namespace atg_scs {
                         double dot = 0;
                         for (int k = 0; k < T_Entries; ++k) {
                             const uint8_t block0 = m_blockData[i * T_Entries + k];
+                            if (block0 == 0xFF) continue;
+
                             for (int l = 0; l < T_Entries; ++l) {
                                 const uint8_t block1 = b_T.m_blockData[j * T_Entries + l];
                                 if (block0 == block1) {
@@ -137,6 +151,32 @@ namespace atg_scs {
                         }
 
                         target->set(j, i, dot);
+                    }
+                }
+            }
+
+            void multiply(Matrix &b, Matrix *target) const {
+                const int b_w = b.getWidth();
+                const int b_h = b.getHeight();
+
+                assert(m_width == b_h);
+
+                target->initialize(b.getWidth(), m_height);
+
+                for (int i = 0; i < m_height; ++i) {
+                    for (int j = 0; j < b_w; ++j) {
+                        double v = 0.0;
+                        for (int k = 0; k < T_Entries; ++k) {
+                            const int offset = k * T_Stride;
+                            const uint8_t block = m_blockData[i * T_Entries + k];
+                            if (block == 0xFF) continue;
+
+                            for (int l = 0; l < T_Stride; ++l) {
+                                v += m_matrix[i][offset + l] * b.get(j, block * T_Stride + l);
+                            }
+                        }
+
+                        target->set(j, i, v);
                     }
                 }
             }

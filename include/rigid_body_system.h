@@ -6,8 +6,6 @@
 #include "force_generator.h"
 #include "matrix.h"
 #include "sparse_matrix.h"
-#include "sle_solver.h"
-#include "ode_solver.h"
 #include "system_state.h"
 
 #include <vector>
@@ -19,10 +17,10 @@ namespace atg_scs {
 
         public:
             RigidBodySystem();
-            ~RigidBodySystem();
+            virtual ~RigidBodySystem();
 
-            void initialize(SleSolver *sleSolver, OdeSolver *odeSolver);
-            void reset();
+            virtual void reset();
+            virtual void process(double dt, int steps = 1);
 
             void addRigidBody(RigidBody *body);
             void removeRigidBody(RigidBody *body);
@@ -33,8 +31,6 @@ namespace atg_scs {
 
             void addForceGenerator(ForceGenerator *generator);
             void removeForceGenerator(ForceGenerator *generator);
-
-            void process(double dt, int steps = 1);
 
             int getRigidBodyCount() const { return (int)m_rigidBodies.size(); }
             int getConstraintCount() const { return (int)m_constraints.size(); }
@@ -51,17 +47,13 @@ namespace atg_scs {
             static float findAverage(long long *samples);
 
             void populateSystemState();
-            void populateMassMatrices();
+            void populateMassMatrices(Matrix *M, Matrix *M_inv);
             void processForces();
-            void processConstraints(long long *evalTime, long long *solveTime, bool calculateConstraintForces);
 
         protected:
             std::vector<RigidBody *> m_rigidBodies;
             std::vector<Constraint *> m_constraints;
             std::vector<ForceGenerator *> m_forceGenerators;
-
-            SleSolver *m_sleSolver;
-            OdeSolver *m_odeSolver;
 
             SystemState m_state;
 
@@ -73,12 +65,10 @@ namespace atg_scs {
 
         protected:
             struct IntermediateValues {
-                SparseMatrix<3> J_sparse, J_dot_sparse, sreg0;
-                Matrix J_T;
+                SparseMatrix<3> J_sparse, sreg0;
                 Matrix M, M_inv;
-                Matrix C;
-                Matrix ks, kd;
-                Matrix q_dot;
+                Matrix v_bias;
+                Matrix q_dot, q_dot_prime;
 
                 Matrix reg0, reg1, reg2;
 
@@ -87,9 +77,7 @@ namespace atg_scs {
 
                 // Results
                 Matrix lambda;
-            };
-
-            IntermediateValues m_iv;
+            } m_iv;
     };
 } /* namespace atg_scs */
 

@@ -105,9 +105,9 @@ void atg_scs::Rk4OdeSolver::solve(SystemState *system) {
         }
 
         for (int i = 0; i < system->n_c; ++i) {
-            m_accumulator.r_x[i] = m_accumulator.r_x[i];
-            m_accumulator.r_y[i] = m_accumulator.r_y[i];
-            m_accumulator.r_t[i] = m_accumulator.r_t[i];
+            system->r_x[i] = m_accumulator.r_x[i];
+            system->r_y[i] = m_accumulator.r_y[i];
+            system->r_t[i] = m_accumulator.r_t[i];
         }
     }
 

@@ -1,10 +1,11 @@
 #ifndef ATG_SIMPLE_2D_CONSTRAINT_SOLVER_SCS_H
 #define ATG_SIMPLE_2D_CONSTRAINT_SOLVER_SCS_H
 
-#include "rigid_body_system.h"
+#include "generic_rigid_body_system.h"
 
 #include "euler_ode_solver.h"
 #include "rk4_ode_solver.h"
+#include "nsv_ode_solver.h"
 
 #include "gauss_seidel_sle_solver.h"
 #include "gaussian_elimination_sle_solver.h"

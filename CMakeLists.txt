@@ -51,6 +51,10 @@ add_library(simple-2d-constraint-solver STATIC
     src/constant_speed_motor.cpp
     src/rolling_constraint.cpp
     src/sparse_matrix.cpp
+    src/constant_rotation_constraint.cpp
+    src/nsv_ode_solver.cpp
+    src/generic_rigid_body_system.cpp
+    src/optimized_nsv_rigid_body_system.cpp
 
     # Header files
     include/rigid_body_system.h
@@ -75,6 +79,11 @@ add_library(simple-2d-constraint-solver STATIC
     include/constant_speed_motor.h
     include/rolling_constraint.h
     include/sparse_matrix.h
+    include/constant_rotation_constraint.h
+    include/nsv_ode_solver.h
+    include/scs.h
+    include/generic_rigid_body_system.h
+    include/optimized_nsv_rigid_body_system.h
 )
 
 # GTEST

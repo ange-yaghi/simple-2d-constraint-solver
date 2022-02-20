@@ -152,6 +152,16 @@ void atg_scs::Matrix::rightScale(Matrix &scale, Matrix *target) {
     }
 }
 
+void atg_scs::Matrix::scale(double s, Matrix *target) {
+    target->resize(m_width, m_height);
+
+    for (int i = 0; i < m_height; ++i) {
+        for (int j = 0; j < m_width; ++j) {
+            target->m_matrix[i][j] = s * m_matrix[i][j];
+        }
+    }
+}
+
 void atg_scs::Matrix::subtract(Matrix &b, Matrix *target) {
     assert(b.m_width == m_width);
     assert(b.m_height == m_height);
@@ -161,6 +171,19 @@ void atg_scs::Matrix::subtract(Matrix &b, Matrix *target) {
     for (int i = 0; i < m_height; ++i) {
         for (int j = 0; j < m_width; ++j) {
             target->m_matrix[i][j] = m_matrix[i][j] - b.m_matrix[i][j];
+        }
+    }
+}
+
+void atg_scs::Matrix::add(Matrix &b, Matrix *target) {
+    assert(b.m_width == m_width);
+    assert(b.m_height == m_height);
+
+    target->resize(m_width, m_height);
+
+    for (int i = 0; i < m_height; ++i) {
+        for (int j = 0; j < m_width; ++j) {
+            target->m_matrix[i][j] = m_matrix[i][j] + b.m_matrix[i][j];
         }
     }
 }

@@ -7,8 +7,6 @@
 #include <cmath>
 
 atg_scs::SystemState::SystemState() {
-    constraintMap = nullptr;
-
     a_theta = nullptr;
     v_theta = nullptr;
     theta = nullptr;
@@ -47,8 +45,6 @@ void atg_scs::SystemState::copy(const SystemState *state) {
         return;
     }
 
-    std::memcpy((void *)constraintMap, (void *)state->constraintMap, sizeof(int) * n_c);
-
     std::memcpy((void *)a_theta, (void *)state->a_theta, sizeof(double) * n);
     std::memcpy((void *)v_theta, (void *)state->v_theta, sizeof(double) * n);
     std::memcpy((void *)theta, (void *)state->theta, sizeof(double) * n);
@@ -80,8 +76,6 @@ void atg_scs::SystemState::resize(int bodyCount, int constraintCount) {
 
     n = bodyCount;
     n_c = constraintCount;
-
-    constraintMap = new int[n_c];
 
     a_theta = new double[n];
     v_theta = new double[n];
@@ -126,8 +120,6 @@ void atg_scs::SystemState::destroy() {
     }
 
     if (n_c > 0) {
-        freeArray(constraintMap);
-
         freeArray(r_x);
         freeArray(r_y);
         freeArray(r_t);

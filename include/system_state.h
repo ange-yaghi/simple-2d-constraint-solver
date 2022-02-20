@@ -15,8 +15,6 @@ namespace atg_scs {
             void velocityAtPoint(double x, double y, double *v_x, double *v_y, int body);
             void applyForce(double x_l, double y_l, double f_x, double f_y, int body);
 
-            int *constraintMap;
-
             double *a_theta;
             double *v_theta;
             double *theta;

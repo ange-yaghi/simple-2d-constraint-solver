@@ -37,7 +37,9 @@ namespace atg_scs {
             void transposeMultiply(Matrix &b, Matrix *target);
             void leftScale(Matrix &scale, Matrix *target);
             void rightScale(Matrix &scale, Matrix *target);
+            void scale(double s, Matrix *target);
             void subtract(Matrix &b, Matrix *target);
+            void add(Matrix &b, Matrix *target);
             void negate(Matrix *target);
             bool equals(Matrix &b, double err = 1e-6);
 

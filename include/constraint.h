@@ -14,6 +14,7 @@ namespace atg_scs {
                 double C[MaxConstraintCount];
                 double J[MaxConstraintCount][3 * MaxBodyCount];
                 double J_dot[MaxConstraintCount][3 * MaxBodyCount];
+                double v_bias[MaxConstraintCount];
                 double ks[MaxConstraintCount];
                 double kd[MaxConstraintCount];
             };
@@ -28,6 +29,10 @@ namespace atg_scs {
             int m_index;
             int m_bodyCount;
             RigidBody *m_bodies[MaxBodyCount];
+
+            double F_x[MaxConstraintCount][MaxBodyCount];
+            double F_y[MaxConstraintCount][MaxBodyCount];
+            double F_t[MaxConstraintCount][MaxBodyCount];
 
         protected:
             int m_constraintCount;

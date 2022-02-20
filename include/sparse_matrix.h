@@ -205,6 +205,30 @@ namespace atg_scs {
                 }
             }
 
+            void leftScale(Matrix &scale, SparseMatrix<T_Stride> *target) {
+                assert(scale.getWidth() == 1);
+                assert(scale.getHeight() == m_width);
+
+                target->initialize(m_width, m_height);
+
+                for (int i = 0; i < m_height; ++i) {
+                    for (int j = 0; j < T_Entries; ++j) {
+                        const uint8_t index = m_blockData[i * T_Entries + j];
+                        if (index == 0xFF) continue;
+
+                        target->setBlock(i, j, index);
+
+                        for (int k = 0; k < T_Stride; ++k) {
+                            target->set(
+                                i,
+                                j,
+                                k,
+                                scale.get(0, index * T_Stride + k) * m_matrix[i][j * T_Stride + k]);
+                        }
+                    }
+                }
+            }
+
             __forceinline int getWidth() const { return m_width; }
             __forceinline int getHeight() const { return m_height; }
 

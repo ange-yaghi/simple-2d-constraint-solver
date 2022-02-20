@@ -53,7 +53,7 @@ namespace atg_scs {
             void populateSystemState();
             void populateMassMatrices();
             void processForces();
-            void processConstraints(long long *evalTime, long long *solveTime);
+            void processConstraints(long long *evalTime, long long *solveTime, bool calculateConstraintForces);
 
         protected:
             std::vector<RigidBody *> m_rigidBodies;
@@ -83,7 +83,7 @@ namespace atg_scs {
                 Matrix reg0, reg1, reg2;
 
                 Matrix right;
-                Matrix F_ext, F_C;
+                Matrix F_ext, F_C, R;
 
                 // Results
                 Matrix lambda;

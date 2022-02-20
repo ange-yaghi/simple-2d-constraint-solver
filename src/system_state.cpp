@@ -24,7 +24,12 @@ atg_scs::SystemState::SystemState() {
 
     m = nullptr;
 
+    r_x = 0;
+    r_y = 0;
+    r_t = 0;
+
     n = 0;
+    n_c = 0;
     dt = 0.0;
 }
 
@@ -33,38 +38,43 @@ atg_scs::SystemState::~SystemState() {
 }
 
 void atg_scs::SystemState::copy(SystemState *state) {
-    resize(state->n);
+    resize(state->n, state->n_c);
 
     if (state->n == 0) {
         return;
     }
 
-    std::memcpy((void *)a_theta, (void *)state->a_theta, sizeof(double) * this->n);
-    std::memcpy((void *)v_theta, (void *)state->v_theta, sizeof(double) * this->n);
-    std::memcpy((void *)theta, (void *)state->theta, sizeof(double) * this->n);
+    std::memcpy((void *)a_theta, (void *)state->a_theta, sizeof(double) * n);
+    std::memcpy((void *)v_theta, (void *)state->v_theta, sizeof(double) * n);
+    std::memcpy((void *)theta, (void *)state->theta, sizeof(double) * n);
 
-    std::memcpy((void *)a_x, (void *)state->a_x, sizeof(double) * this->n);
-    std::memcpy((void *)a_y, (void *)state->a_y, sizeof(double) * this->n);
-    std::memcpy((void *)v_x, (void *)state->v_x, sizeof(double) * this->n);
-    std::memcpy((void *)v_y, (void *)state->v_y, sizeof(double) * this->n);
-    std::memcpy((void *)p_x, (void *)state->p_x, sizeof(double) * this->n);
-    std::memcpy((void *)p_y, (void *)state->p_y, sizeof(double) * this->n);
+    std::memcpy((void *)a_x, (void *)state->a_x, sizeof(double) * n);
+    std::memcpy((void *)a_y, (void *)state->a_y, sizeof(double) * n);
+    std::memcpy((void *)v_x, (void *)state->v_x, sizeof(double) * n);
+    std::memcpy((void *)v_y, (void *)state->v_y, sizeof(double) * n);
+    std::memcpy((void *)p_x, (void *)state->p_x, sizeof(double) * n);
+    std::memcpy((void *)p_y, (void *)state->p_y, sizeof(double) * n);
 
-    std::memcpy((void *)f_x, (void *)state->f_x, sizeof(double) * this->n);
-    std::memcpy((void *)f_y, (void *)state->f_y, sizeof(double) * this->n);
-    std::memcpy((void *)t, (void *)state->t, sizeof(double) * this->n);
+    std::memcpy((void *)f_x, (void *)state->f_x, sizeof(double) * n);
+    std::memcpy((void *)f_y, (void *)state->f_y, sizeof(double) * n);
+    std::memcpy((void *)t, (void *)state->t, sizeof(double) * n);
 
-    std::memcpy((void *)m, (void *)state->m, sizeof(double) * this->n);
+    std::memcpy((void *)m, (void *)state->m, sizeof(double) * n);
+
+    std::memcpy((void *)r_x, (void *)state->r_x, sizeof(double) * n_c * 2);
+    std::memcpy((void *)r_y, (void *)state->r_y, sizeof(double) * n_c * 2);
+    std::memcpy((void *)r_t, (void *)state->r_t, sizeof(double) * n_c * 2);
 }
 
-void atg_scs::SystemState::resize(int bodyCount) {
-    if (this->n >= bodyCount) {
+void atg_scs::SystemState::resize(int bodyCount, int constraintCount) {
+    if (n >= bodyCount && n_c >= constraintCount) {
         return;
     }
 
     destroy();
 
-    this->n = bodyCount;
+    n = bodyCount;
+    n_c = bodyCount;
 
     a_theta = new double[n];
     v_theta = new double[n];
@@ -82,10 +92,14 @@ void atg_scs::SystemState::resize(int bodyCount) {
     t = new double[n];
 
     m = new double[n];
+
+    r_x = new double[(size_t)n_c * 2];
+    r_y = new double[(size_t)n_c * 2];
+    r_t = new double[(size_t)n_c * 2];
 }
 
 void atg_scs::SystemState::destroy() {
-    if (this->n > 0) {
+    if (n > 0) {
         freeArray(a_theta);
         freeArray(v_theta);
         freeArray(theta);
@@ -104,7 +118,14 @@ void atg_scs::SystemState::destroy() {
         freeArray(m);
     }
 
+    if (n_c > 0) {
+        freeArray(r_x);
+        freeArray(r_y);
+        freeArray(r_t);
+    }
+
     n = 0;
+    n_c = 0;
 }
 
 void atg_scs::SystemState::localToWorld(

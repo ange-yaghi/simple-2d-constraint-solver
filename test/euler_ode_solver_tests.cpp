@@ -24,7 +24,7 @@ TEST(EulerOdeSolverTests, EulerOdeSolverSanity) {
     atg_scs::EulerOdeSolver solver;
     atg_scs::SystemState state;
 
-    state.resize(1);
+    state.resize(1, 1);
 
     EXPECT_TRUE(solver.step(&state));
 
@@ -35,7 +35,7 @@ TEST(EulerOdeSolverTests, EulerOdeSolverIntegrate1Step) {
     atg_scs::EulerOdeSolver solver;
     atg_scs::SystemState state;
 
-    state.resize(1);
+    state.resize(1, 1);
 
     state.a_theta[0] = 10.0;
     state.v_theta[0] = 0.0;
@@ -68,7 +68,7 @@ TEST(EulerOdeSolverTests, EulerOdeSolverIntegrate100Steps) {
     atg_scs::EulerOdeSolver solver;
     atg_scs::SystemState state;
 
-    state.resize(1);
+    state.resize(1, 1);
 
     state.a_theta[0] = 10.0;
     state.v_theta[0] = 9.0;

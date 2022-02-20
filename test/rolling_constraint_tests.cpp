@@ -57,7 +57,7 @@ TEST(RollingConstraintTests, RollingConstraintTest) {
     atg_scs::RollingConstraint constraint;
     atg_scs::SystemState system;
 
-    system.resize(2);
+    system.resize(2, 2);
 
     atg_scs::RigidBody base, rolling;
     base.index = 0;

@@ -8,7 +8,7 @@ namespace atg_scs {
             ~SystemState();
 
             void copy(SystemState *state);
-            void resize(int bodyCount);
+            void resize(int bodyCount, int constraintCount);
             void destroy();
 
             void localToWorld(double x, double y, double *x_t, double *y_t, int body);
@@ -30,9 +30,14 @@ namespace atg_scs {
             double *f_y;
             double *t;
 
+            double *r_x;
+            double *r_y;
+            double *r_t;
+
             double *m;
 
             int n;
+            int n_c;
             double dt;
     };
 } /* namespace atg_scs */

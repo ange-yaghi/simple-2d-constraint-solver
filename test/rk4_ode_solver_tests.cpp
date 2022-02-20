@@ -24,7 +24,7 @@ TEST(Rk4OdeSolverTests, Rk4OdeSolverSanity) {
     atg_scs::Rk4OdeSolver solver;
     atg_scs::SystemState state;
 
-    state.resize(1);
+    state.resize(1, 1);
 
     EXPECT_FALSE(solver.step(&state));
 
@@ -35,7 +35,7 @@ TEST(Rk4OdeSolverTests, Rk4OdeSolverIntegrate1Step) {
     atg_scs::Rk4OdeSolver solver;
     atg_scs::SystemState state;
 
-    state.resize(1);
+    state.resize(1, 1);
 
     state.a_theta[0] = 10.0;
     state.v_theta[0] = 0.0;
@@ -68,7 +68,7 @@ TEST(Rk4OdeSolverTests, Rk4OdeSolverIntegrate100Steps) {
     atg_scs::Rk4OdeSolver solver;
     atg_scs::SystemState state;
 
-    state.resize(1);
+    state.resize(1, 1);
 
     state.a_theta[0] = 10.0;
     state.v_theta[0] = 9.0;

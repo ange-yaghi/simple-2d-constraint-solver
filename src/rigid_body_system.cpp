@@ -102,7 +102,7 @@ void atg_scs::RigidBodySystem::process(double dt, int steps) {
             processForces();
             auto s1 = std::chrono::steady_clock::now();
 
-            processConstraints(&evalTime, &solveTime);
+            processConstraints(&evalTime, &solveTime, true);
 
             auto s2 = std::chrono::steady_clock::now();
             m_odeSolver->solve(&m_state);
@@ -180,8 +180,9 @@ float atg_scs::RigidBodySystem::getForceEvalMicroseconds() const {
 
 void atg_scs::RigidBodySystem::populateSystemState() {
     const int n = getRigidBodyCount();
+    const int n_c = getConstraintCount();
 
-    m_state.resize(n);
+    m_state.resize(n, n_c);
 
     for (int i = 0; i < n; ++i) {
         m_state.a_x[i] = 0;
@@ -235,7 +236,8 @@ void atg_scs::RigidBodySystem::processForces() {
 
 void atg_scs::RigidBodySystem::processConstraints(
         long long *evalTime,
-        long long *solveTime)
+        long long *solveTime,
+        bool calculateConstraintForces)
 {
     *evalTime = -1;
     *solveTime = -1;
@@ -328,6 +330,12 @@ void atg_scs::RigidBodySystem::processConstraints(
 
     m_iv.J_sparse.expandTransposed(&m_iv.J_T);
     m_iv.J_T.multiply(m_iv.lambda, &m_iv.F_C);
+
+    if (calculateConstraintForces) {
+        // J = (3 * n) x m_f
+        // J_T = m_f x (3 * n)
+        //m_iv.J_T.rightScale(m_iv.lambda, &m_iv.R);
+    }
 
     for (int i = 0; i < n; ++i) {
         const double invMass = m_iv.M_inv.get(0, i * 3 + 0);

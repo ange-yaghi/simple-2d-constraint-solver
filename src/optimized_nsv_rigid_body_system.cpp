@@ -4,6 +4,7 @@
 
 atg_scs::OptimizedNsvRigidBodySystem::OptimizedNsvRigidBodySystem() {
     m_sleSolver = nullptr;
+    m_biasFactor = 1.0;
 }
 
 atg_scs::OptimizedNsvRigidBodySystem::~OptimizedNsvRigidBodySystem() {
@@ -36,7 +37,7 @@ void atg_scs::OptimizedNsvRigidBodySystem::process(double dt, int steps) {
             processForces();
             auto s1 = std::chrono::steady_clock::now();
 
-            processConstraints(dt, &evalTime, &solveTime);
+            processConstraints(dt / steps, &evalTime, &solveTime);
 
             auto s2 = std::chrono::steady_clock::now();
             m_odeSolver.solve(&m_state);
@@ -105,15 +106,9 @@ void atg_scs::OptimizedNsvRigidBodySystem::processConstraints(
     const int m_f = getFullConstraintCount();
     const int m = getConstraintCount();
 
-    m_iv.q_dot.resize(1, n * 3);
-    for (int i = 0; i < n; ++i) {
-        m_iv.q_dot.set(0, i * 3 + 0, m_state.v_x[i]);
-        m_iv.q_dot.set(0, i * 3 + 1, m_state.v_y[i]);
-        m_iv.q_dot.set(0, i * 3 + 2, m_state.v_theta[i]);
-    }
-
     m_iv.J_sparse.initialize(3 * n, m_f);
     m_iv.v_bias.initialize(1, m_f);
+    m_iv.C.initialize(1, m_f);
 
     Constraint::Output constraintOutput;
     for (int j = 0, j_f = 0; j < m; ++j) {
@@ -139,7 +134,15 @@ void atg_scs::OptimizedNsvRigidBodySystem::processConstraints(
             }
 
             m_iv.v_bias.set(0, j_f, constraintOutput.v_bias[k]);
+            m_iv.C.set(0, j_f, constraintOutput.C[k]);
         }
+    }
+
+    m_iv.q_dot.resize(1, n * 3);
+    for (int i = 0; i < n; ++i) {
+        m_iv.q_dot.set(0, i * 3 + 0, m_state.v_x[i]);
+        m_iv.q_dot.set(0, i * 3 + 1, m_state.v_y[i]);
+        m_iv.q_dot.set(0, i * 3 + 2, m_state.v_theta[i]);
     }
 
     m_iv.F_ext.initialize(1, 3 * n, 0.0);
@@ -155,11 +158,16 @@ void atg_scs::OptimizedNsvRigidBodySystem::processConstraints(
     m_iv.reg0.leftScale(m_iv.M_inv, &m_iv.reg1);
     m_iv.reg1.add(m_iv.q_dot, &m_iv.q_dot_prime);
 
+    // Calculate b_err
+    //  b_err = (bias_factor / dt) * C
+    m_iv.C.scale(m_biasFactor / dt, &m_iv.b_err);
+
     // Calculate right side of linear equation
-    //  -(J * q_dot_prime + v_bias)
+    //  -(J * q_dot_prime + v_bias + b_err)
     m_iv.J_sparse.multiply(m_iv.q_dot_prime, &m_iv.reg0);
     m_iv.reg0.add(m_iv.v_bias, &m_iv.reg1);
-    m_iv.reg1.negate(&m_iv.right);
+    m_iv.reg1.add(m_iv.b_err, &m_iv.reg0);
+    m_iv.reg0.negate(&m_iv.right);
 
     auto s1 = std::chrono::steady_clock::now();
 

@@ -147,4 +147,7 @@ void atg_scs::RollingConstraint::calculate(
 
     output->C[0] = C0;
     output->C[1] = C1;
+
+    output->v_bias[0] = 0;
+    output->v_bias[1] = 0;
 }

@@ -60,4 +60,5 @@ void atg_scs::LineConstraint::calculate(
     output->kd[0] = m_kd;
 
     output->C[0] = C;
+    output->v_bias[0] = 0;
 }

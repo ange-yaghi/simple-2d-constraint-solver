@@ -2,6 +2,7 @@
 #define ATG_SIMPLE_2D_CONSTRAINT_SOLVER_SCS_H
 
 #include "generic_rigid_body_system.h"
+#include "optimized_nsv_rigid_body_system.h"
 
 #include "euler_ode_solver.h"
 #include "rk4_ode_solver.h"
@@ -19,5 +20,6 @@
 #include "link_constraint.h"
 #include "line_constraint.h"
 #include "rolling_constraint.h"
+#include "constant_rotation_constraint.h"
 
 #endif /* ATG_SIMPLE_2D_CONSTRAINT_SOLVER_SCS_H */

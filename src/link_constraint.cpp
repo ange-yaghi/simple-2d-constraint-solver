@@ -88,6 +88,9 @@ void atg_scs::LinkConstraint::calculate(
 
     output->C[0] = C1;
     output->C[1] = C2;
+
+    output->v_bias[0] = 0;
+    output->v_bias[1] = 0;
 }
 
 void atg_scs::LinkConstraint::setLocalPosition1(double x, double y) {

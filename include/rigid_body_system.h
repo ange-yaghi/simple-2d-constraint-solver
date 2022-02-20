@@ -62,22 +62,6 @@ namespace atg_scs {
             long long *m_forceEvalMicroseconds;
             long long *m_constraintEvalMicroseconds;
             long long m_frameIndex;
-
-        protected:
-            struct IntermediateValues {
-                SparseMatrix<3> J_sparse, sreg0;
-                Matrix M, M_inv;
-                Matrix v_bias;
-                Matrix q_dot, q_dot_prime;
-
-                Matrix reg0, reg1, reg2;
-
-                Matrix right;
-                Matrix F_ext, F_C, R;
-
-                // Results
-                Matrix lambda;
-            } m_iv;
     };
 } /* namespace atg_scs */
 

@@ -15,12 +15,6 @@ atg_scs::GaussianEliminationSleSolver::~GaussianEliminationSleSolver() {
     m_reg.destroy();
 }
 
-double fastAbs(double v) {
-    return (v > 0)
-        ? v
-        : -1;
-}
-
 bool atg_scs::GaussianEliminationSleSolver::solve(
         SparseMatrix<3> &J,
         Matrix &W,

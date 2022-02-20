@@ -7,13 +7,15 @@ namespace atg_scs {
             SystemState();
             ~SystemState();
 
-            void copy(SystemState *state);
+            void copy(const SystemState *state);
             void resize(int bodyCount, int constraintCount);
             void destroy();
 
             void localToWorld(double x, double y, double *x_t, double *y_t, int body);
             void velocityAtPoint(double x, double y, double *v_x, double *v_y, int body);
             void applyForce(double x_l, double y_l, double f_x, double f_y, int body);
+
+            int *constraintMap;
 
             double *a_theta;
             double *v_theta;

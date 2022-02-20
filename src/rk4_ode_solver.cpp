@@ -88,6 +88,12 @@ void atg_scs::Rk4OdeSolver::solve(SystemState *system) {
         m_accumulator.p_y[i] += (m_dt / 6.0) * system->v_y[i] * stageWeight;
     }
 
+    for (int i = 0; i < system->n_c; ++i) {
+        m_accumulator.r_x[i] += (m_dt / 6.0) * system->r_x[i] * stageWeight;
+        m_accumulator.r_y[i] += (m_dt / 6.0) * system->r_y[i] * stageWeight;
+        m_accumulator.r_t[i] += (m_dt / 6.0) * system->r_t[i] * stageWeight;
+    }
+
     if (m_stage == RkStage::Stage_4) {
         for (int i = 0; i < system->n; ++i) {
             system->v_theta[i] = m_accumulator.v_theta[i];
@@ -96,6 +102,12 @@ void atg_scs::Rk4OdeSolver::solve(SystemState *system) {
             system->v_y[i] = m_accumulator.v_y[i];
             system->p_x[i] = m_accumulator.p_x[i];
             system->p_y[i] = m_accumulator.p_y[i];
+        }
+
+        for (int i = 0; i < system->n_c; ++i) {
+            m_accumulator.r_x[i] = m_accumulator.r_x[i];
+            m_accumulator.r_y[i] = m_accumulator.r_y[i];
+            m_accumulator.r_t[i] = m_accumulator.r_t[i];
         }
     }
 

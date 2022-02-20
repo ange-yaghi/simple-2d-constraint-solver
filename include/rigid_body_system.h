@@ -73,7 +73,7 @@ namespace atg_scs {
 
         protected:
             struct IntermediateValues {
-                SparseMatrix<3> J_sparse, J_dot_sparse;
+                SparseMatrix<3> J_sparse, J_dot_sparse, sreg0;
                 Matrix J_T;
                 Matrix M, M_inv;
                 Matrix C;

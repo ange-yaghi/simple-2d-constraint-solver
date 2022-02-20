@@ -7,7 +7,7 @@
 namespace atg_scs {
     class Constraint {
         public:
-            static constexpr int MaxConstraintCount = 6;
+            static constexpr int MaxConstraintCount = 3;
             static constexpr int MaxBodyCount = 2;
 
             struct Output {
@@ -18,16 +18,12 @@ namespace atg_scs {
                 double kd[MaxConstraintCount];
             };
 
-            struct Lambda {
-                double lambda[MaxConstraintCount];
-            };
-
         public:
             Constraint(int constraintCount, int bodyCount);
             virtual ~Constraint();
 
             virtual void calculate(Output *output, SystemState *state);
-            virtual int getConstraintCount() const { return m_constraintCount; }
+            __forceinline int getConstraintCount() const { return m_constraintCount; }
 
             int m_index;
             int m_bodyCount;

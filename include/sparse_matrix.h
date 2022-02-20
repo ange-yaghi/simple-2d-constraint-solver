@@ -116,6 +116,14 @@ namespace atg_scs {
                 m_matrix[row][entry * T_Stride + slice] = v;
             }
 
+            inline double get(int row, int entry, int slice) {
+                assert(row >= 0 && row < m_height);
+                assert(entry >= 0 && entry < T_Entries);
+                assert(slice < T_Stride);
+
+                return m_matrix[row][entry * T_Stride + slice];
+            }
+
             inline void setEmpty(int row, int col) {
                 assert(row >= 0 && row < m_height);
                 assert(col >= 0 && col < T_Entries);
@@ -207,7 +215,7 @@ namespace atg_scs {
 
             void leftScale(Matrix &scale, SparseMatrix<T_Stride> *target) {
                 assert(scale.getWidth() == 1);
-                assert(scale.getHeight() == m_width);
+                assert(scale.getHeight() == m_height);
 
                 target->initialize(m_width, m_height);
 
@@ -223,7 +231,7 @@ namespace atg_scs {
                                 i,
                                 j,
                                 k,
-                                scale.get(0, index * T_Stride + k) * m_matrix[i][j * T_Stride + k]);
+                                scale.get(0, i) * m_matrix[i][j * T_Stride + k]);
                         }
                     }
                 }

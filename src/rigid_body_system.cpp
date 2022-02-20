@@ -180,7 +180,7 @@ float atg_scs::RigidBodySystem::getForceEvalMicroseconds() const {
 
 void atg_scs::RigidBodySystem::populateSystemState() {
     const int n = getRigidBodyCount();
-    const int n_c = getConstraintCount();
+    const int n_c = getFullConstraintCount();
 
     m_state.resize(n, n_c);
 
@@ -262,19 +262,18 @@ void atg_scs::RigidBodySystem::processConstraints(
     m_iv.C.initialize(1, m_f);
 
     Constraint::Output constraintOutput;
-    int c_i = 0;
-    for (int j = 0; j < m; ++j) {
+    for (int j = 0, j_f = 0; j < m; ++j) {
         m_constraints[j]->calculate(&constraintOutput, &m_state);
-        const int c_n = m_constraints[j]->getConstraintCount();
 
-        for (int k = 0; k < c_n; ++k) {
+        const int n_f = m_constraints[j]->getConstraintCount();
+        for (int k = 0; k < n_f; ++k, ++j_f) {
             for (int i = 0; i < m_constraints[j]->m_bodyCount; ++i) {
                 const int index = m_constraints[j]->m_bodies[i]->index;
 
                 if (index == -1) continue;
 
-                m_iv.J_sparse.setBlock(c_i + k, i, index);
-                m_iv.J_dot_sparse.setBlock(c_i + k, i, index);
+                m_iv.J_sparse.setBlock(j_f, i, index);
+                m_iv.J_dot_sparse.setBlock(j_f, i, index);
             }
 
             for (int i = 0; i < m_constraints[j]->m_bodyCount * 3; ++i) {
@@ -282,19 +281,17 @@ void atg_scs::RigidBodySystem::processConstraints(
 
                 if (index == -1) continue;
 
-                m_iv.J_sparse.set(c_i + k, i / 3, i % 3,
+                m_iv.J_sparse.set(j_f, i / 3, i % 3,
                         constraintOutput.J[k][i]);
 
-                m_iv.J_dot_sparse.set(c_i + k, i / 3, i % 3,
+                m_iv.J_dot_sparse.set(j_f, i / 3, i % 3,
                         constraintOutput.J_dot[k][i]);
 
-                m_iv.ks.set(0, c_i + k, constraintOutput.ks[k]);
-                m_iv.kd.set(0, c_i + k, constraintOutput.kd[k]);
-                m_iv.C.set(0, c_i + k, constraintOutput.C[k]);
+                m_iv.ks.set(0, j_f, constraintOutput.ks[k]);
+                m_iv.kd.set(0, j_f, constraintOutput.kd[k]);
+                m_iv.C.set(0, j_f, constraintOutput.C[k]);
             }
         }
-
-        c_i += c_n;
     }
 
     m_iv.J_sparse.multiply(m_iv.q_dot, &m_iv.reg0);
@@ -328,35 +325,51 @@ void atg_scs::RigidBodySystem::processConstraints(
 
     auto s2 = std::chrono::steady_clock::now();
 
-    m_iv.J_sparse.expandTransposed(&m_iv.J_T);
-    m_iv.J_T.multiply(m_iv.lambda, &m_iv.F_C);
+    // Constraint force derivation
+    //  R = J_T * lambda_scale
+    //  => transpose(J) * transpose(transpose(lambda_scale)) = R
+    //  => transpose(lambda_scale * J) = R
+    //  => transpose(J.leftScale(lambda_scale)) = R
 
-    if (calculateConstraintForces) {
-        // J = (3 * n) x m_f
-        // J_T = m_f x (3 * n)
-        //m_iv.J_T.rightScale(m_iv.lambda, &m_iv.R);
+    m_iv.J_sparse.leftScale(m_iv.lambda, &m_iv.sreg0);
+
+    for (int i = 0; i < m_f; ++i) {
+        for (int j = 0; j < 2; ++j) {
+            m_state.r_x[i * 2 + j] = m_iv.sreg0.get(i, j, 0);
+            m_state.r_y[i * 2 + j] = m_iv.sreg0.get(i, j, 1);
+            m_state.r_t[i * 2 + j] = m_iv.sreg0.get(i, j, 2);
+        }
+    }
+
+    for (int i = 0; i < n; ++i) {
+        m_state.a_x[i] = m_iv.F_ext.get(0, i * 3 + 0);
+        m_state.a_y[i] = m_iv.F_ext.get(0, i * 3 + 1);
+        m_state.a_theta[i] = m_iv.F_ext.get(0, i * 3 + 2);
+    }
+
+    for (int i = 0, j_f = 0; i < m; ++i) {
+        Constraint *constraint = m_constraints[i];
+
+        m_state.constraintMap[i] = j_f;
+
+        const int n_f = constraint->getConstraintCount();
+        for (int j = 0; j < n_f; ++j, ++j_f) {
+            for (int k = 0; k < constraint->m_bodyCount; ++k) {
+                const int body = constraint->m_bodies[k]->index;
+                m_state.a_x[body] += m_state.r_x[j_f * 2 + k];
+                m_state.a_y[body] += m_state.r_y[j_f * 2 + k];
+                m_state.a_theta[body] += m_state.r_t[j_f * 2 + k];
+            }
+        }
     }
 
     for (int i = 0; i < n; ++i) {
         const double invMass = m_iv.M_inv.get(0, i * 3 + 0);
         const double invInertia = m_iv.M_inv.get(0, i * 3 + 2);
 
-        const double F_C_x = (m_f > 0)
-            ? m_iv.F_C.get(0, i * 3 + 0)
-            : 0;
-        const double F_C_y = (m_f > 0)
-            ? m_iv.F_C.get(0, i * 3 + 1)
-            : 0;
-        const double F_C_t = (m_f > 0)
-            ? m_iv.F_C.get(0, i * 3 + 2)
-            : 0;
-
-        m_state.a_x[i] =
-            invMass * (F_C_x + m_iv.F_ext.get(0, i * 3 + 0));
-        m_state.a_y[i] =
-            invMass * (F_C_y + m_iv.F_ext.get(0, i * 3 + 1));
-        m_state.a_theta[i] =
-            invInertia * (F_C_t + m_iv.F_ext.get(0, i * 3 + 2));
+        m_state.a_x[i] *= invMass;
+        m_state.a_y[i] *= invMass;
+        m_state.a_theta[i] *= invInertia;
     }
 
     auto s3 = std::chrono::steady_clock::now();

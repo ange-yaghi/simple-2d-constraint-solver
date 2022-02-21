@@ -3,6 +3,7 @@
 
 #include "system_state.h"
 #include "rigid_body.h"
+#include "matrix.h"
 
 namespace atg_scs {
     class Constraint {
@@ -25,6 +26,7 @@ namespace atg_scs {
 
             virtual void calculate(Output *output, SystemState *state);
             __forceinline int getConstraintCount() const { return m_constraintCount; }
+            virtual void limit(Matrix *lambda, int index);
 
             int m_index;
             int m_bodyCount;

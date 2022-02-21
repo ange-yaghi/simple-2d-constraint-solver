@@ -12,10 +12,14 @@ namespace atg_scs {
             void setBody(RigidBody *body) { m_bodies[0] = body; }
 
             virtual void calculate(Output *output, SystemState *system);
+            virtual void limit(Matrix *lambda, int index);
 
             double m_rotationSpeed;
             double m_ks;
             double m_kd;
+
+            double m_minTorque;
+            double m_maxTorque;
     };
 } /* namespace atg_scs */
 

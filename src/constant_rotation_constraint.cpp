@@ -1,9 +1,12 @@
 #include "../include/constant_rotation_constraint.h"
 
+#include <limits>
 #include <cmath>
 
 atg_scs::ConstantRotationConstraint::ConstantRotationConstraint() : Constraint(1, 1) {
     m_rotationSpeed = 0.0;
+    m_maxTorque = DBL_MAX;
+    m_minTorque = DBL_MIN;
     m_ks = 10.0;
     m_kd = 1.0;
 }
@@ -38,4 +41,10 @@ void atg_scs::ConstantRotationConstraint::calculate(
     output->C[0] = 0;
 
     output->v_bias[0] = m_rotationSpeed;
+}
+
+void atg_scs::ConstantRotationConstraint::limit(Matrix *lambda, int index) {
+    const double torque = lambda->get(0, index);
+
+    lambda->set(0, index, std::fmin(m_maxTorque, std::fmax(m_minTorque, torque)));
 }

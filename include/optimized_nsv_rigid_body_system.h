@@ -34,6 +34,8 @@ namespace atg_scs {
                 Matrix C;
                 Matrix M, M_inv;
                 Matrix b_err, v_bias;
+                Matrix limit_min, limit_max;
+
                 Matrix q_dot, q_dot_prime;
 
                 Matrix reg0, reg1, reg2;

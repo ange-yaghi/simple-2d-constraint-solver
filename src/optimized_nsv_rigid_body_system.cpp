@@ -1,6 +1,7 @@
 #include "../include/optimized_nsv_rigid_body_system.h"
 
 #include <chrono>
+#include <cmath>
 
 atg_scs::OptimizedNsvRigidBodySystem::OptimizedNsvRigidBodySystem() {
     m_sleSolver = nullptr;
@@ -84,9 +85,9 @@ void atg_scs::OptimizedNsvRigidBodySystem::propagateResults() {
 
         for (int j = 0; j < constraint->getConstraintCount(); ++j, ++i_f) {
             for (int k = 0; k < constraint->m_bodyCount; ++k) {
-                constraint->F_x[j][k] = m_state.r_x[i_f];
-                constraint->F_y[j][k] = m_state.r_y[i_f];
-                constraint->F_t[j][k] = m_state.r_t[i_f];
+                constraint->F_x[j][k] = m_state.r_x[i_f * 2 + k];
+                constraint->F_y[j][k] = m_state.r_y[i_f * 2 + k];
+                constraint->F_t[j][k] = m_state.r_t[i_f * 2 + k];
             }
         }
     }
@@ -183,13 +184,20 @@ void atg_scs::OptimizedNsvRigidBodySystem::processConstraints(
     //  => transpose(lambda_scale * J) = R
     //  => transpose(J.leftScale(lambda_scale)) = R
 
-    m_iv.J_sparse.leftScale(m_iv.lambda, &m_iv.sreg0);
+    m_iv.lambda.scale(1 / dt, &m_iv.reg0);
+
+    for (int i = 0, j_f = 0; i < m; ++i) {
+        m_constraints[i]->limit(&m_iv.reg0, j_f);
+        j_f += m_constraints[i]->getConstraintCount();
+    }
+
+    m_iv.J_sparse.leftScale(m_iv.reg0, &m_iv.sreg0);
 
     for (int i = 0; i < m_f; ++i) {
         for (int j = 0; j < 2; ++j) {
-            m_state.r_x[i * 2 + j] = m_iv.sreg0.get(i, j, 0) / dt;
-            m_state.r_y[i * 2 + j] = m_iv.sreg0.get(i, j, 1) / dt;
-            m_state.r_t[i * 2 + j] = m_iv.sreg0.get(i, j, 2) / dt;
+            m_state.r_x[i * 2 + j] = m_iv.sreg0.get(i, j, 0);
+            m_state.r_y[i * 2 + j] = m_iv.sreg0.get(i, j, 1);
+            m_state.r_t[i * 2 + j] = m_iv.sreg0.get(i, j, 2);
         }
     }
 

@@ -186,9 +186,8 @@ void atg_scs::OptimizedNsvRigidBodySystem::processConstraints(
 
     m_iv.lambda.scale(1 / dt, &m_iv.reg0);
 
-    for (int i = 0, j_f = 0; i < m; ++i) {
-        m_constraints[i]->limit(&m_iv.reg0, j_f);
-        j_f += m_constraints[i]->getConstraintCount();
+    for (int i = 0; i < m; ++i) {
+        m_constraints[i]->limit(&m_iv.reg0, &m_state);
     }
 
     m_iv.J_sparse.leftScale(m_iv.reg0, &m_iv.sreg0);

@@ -26,7 +26,7 @@ namespace atg_scs {
 
             virtual void calculate(Output *output, SystemState *state);
             __forceinline int getConstraintCount() const { return m_constraintCount; }
-            virtual void limit(Matrix *lambda, int index);
+            virtual void limit(Matrix *lambda, SystemState *state);
 
             int m_index;
             int m_bodyCount;

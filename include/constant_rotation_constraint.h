@@ -8,11 +8,11 @@ namespace atg_scs {
         public:
             ConstantRotationConstraint();
             virtual ~ConstantRotationConstraint();
-            
+
             void setBody(RigidBody *body) { m_bodies[0] = body; }
 
-            virtual void calculate(Output *output, SystemState *system);
-            virtual void limit(Matrix *lambda, int index);
+            virtual void calculate(Output *output, SystemState *state);
+            virtual void limit(Matrix *lambda, SystemState *state);
 
             double m_rotationSpeed;
             double m_ks;

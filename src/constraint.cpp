@@ -13,7 +13,7 @@ atg_scs::Constraint::Constraint(int constraintCount, int bodyCount) {
     m_index = -1;
 
     memset(m_bodies, 0, sizeof(int) * MaxBodyCount);
-    
+
     for (int i = 0; i < MaxConstraintCount; ++i) {
         for (int j = 0; j < MaxBodyCount; ++j) {
             F_x[i][j] = F_y[i][j] = F_t[i][j] = 0;
@@ -29,6 +29,6 @@ void atg_scs::Constraint::calculate(Output *output, SystemState *state) {
     /* void */
 }
 
-void atg_scs::Constraint::limit(Matrix *lambda, int index) {
+void atg_scs::Constraint::limit(Matrix *lambda, SystemState *state) {
     /* void */
 }

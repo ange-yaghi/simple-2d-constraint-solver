@@ -15,18 +15,7 @@ atg_scs::ConstantRotationConstraint::~ConstantRotationConstraint() {
     /* void */
 }
 
-void atg_scs::ConstantRotationConstraint::calculate(
-        Output *output,
-        SystemState *state)
-{
-    const int body = m_bodies[0]->index;
-
-    const double q1 = state->p_x[body];
-    const double q2 = state->p_y[body];
-    const double q3 = state->theta[body];
-
-    const double q3_dot = state->v_theta[body];
-
+void atg_scs::ConstantRotationConstraint::calculate(Output *output, SystemState *state) {
     output->J[0][0] = 0;
     output->J[0][1] = 0;
     output->J[0][2] = 1;
@@ -43,7 +32,8 @@ void atg_scs::ConstantRotationConstraint::calculate(
     output->v_bias[0] = m_rotationSpeed;
 }
 
-void atg_scs::ConstantRotationConstraint::limit(Matrix *lambda, int index) {
+void atg_scs::ConstantRotationConstraint::limit(Matrix *lambda, SystemState *state) {
+    const int index = state->indexMap[m_index];
     const double torque = lambda->get(0, index);
 
     lambda->set(0, index, std::fmin(m_maxTorque, std::fmax(m_minTorque, torque)));

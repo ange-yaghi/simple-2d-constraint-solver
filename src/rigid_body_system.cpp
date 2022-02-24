@@ -116,6 +116,7 @@ float atg_scs::RigidBodySystem::getForceEvalMicroseconds() const {
 void atg_scs::RigidBodySystem::populateSystemState() {
     const int n = getRigidBodyCount();
     const int n_c = getFullConstraintCount();
+    const int m = getConstraintCount();
 
     m_state.resize(n, n_c);
 
@@ -134,6 +135,11 @@ void atg_scs::RigidBodySystem::populateSystemState() {
         m_state.theta[i] = m_rigidBodies[i]->theta;
 
         m_state.m[i] = m_rigidBodies[i]->m;
+    }
+
+    for (int i = 0, j_f = 0; i < m; ++i) {
+        m_state.indexMap[i] = j_f;
+        j_f += m_constraints[i]->getConstraintCount();
     }
 }
 

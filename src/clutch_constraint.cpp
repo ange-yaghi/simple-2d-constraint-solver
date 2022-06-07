@@ -3,7 +3,7 @@
 #include <cmath>
 #include <cfloat>
 
-atg_scs::CluchConstraint::CluchConstraint() : Constraint(1, 2) {
+atg_scs::ClutchConstraint::ClutchConstraint() : Constraint(1, 2) {
     m_ks = 10.0;
     m_kd = 1.0;
 
@@ -11,11 +11,11 @@ atg_scs::CluchConstraint::CluchConstraint() : Constraint(1, 2) {
     m_minTorque = -1000.0;
 }
 
-atg_scs::CluchConstraint::~CluchConstraint() {
+atg_scs::ClutchConstraint::~ClutchConstraint() {
     /* void */
 }
 
-void atg_scs::CluchConstraint::calculate(
+void atg_scs::ClutchConstraint::calculate(
         Output *output,
         SystemState *state)
 {
@@ -51,11 +51,11 @@ void atg_scs::CluchConstraint::calculate(
     output->v_bias[0] = 0;
 }
 
-void atg_scs::CluchConstraint::limit(
+void atg_scs::ClutchConstraint::limit(
     atg_scs::Matrix *lambda,
     atg_scs::SystemState *state)
 {
     const int index = state->indexMap[m_index];
     const double calculatedTorque = lambda->get(0, index);
-    //lambda->set(0, index, std::fmin(m_maxTorque, std::fmax(m_minTorque, calculatedTorque)));
+    lambda->set(0, index, std::fmin(m_maxTorque, std::fmax(m_minTorque, calculatedTorque)));
 }

@@ -4,10 +4,10 @@
 #include "constraint.h"
 
 namespace atg_scs {
-    class CluchConstraint : public Constraint {
+    class ClutchConstraint : public Constraint {
         public:
-            CluchConstraint();
-            virtual ~CluchConstraint();
+            ClutchConstraint();
+            virtual ~ClutchConstraint();
             
             void setBody1(RigidBody *body) { m_bodies[0] = body; }
             void setBody2(RigidBody *body) { m_bodies[1] = body; }

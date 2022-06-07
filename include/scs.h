@@ -21,5 +21,6 @@
 #include "line_constraint.h"
 #include "rolling_constraint.h"
 #include "constant_rotation_constraint.h"
+#include "clutch_constraint.h"
 
 #endif /* ATG_SIMPLE_2D_CONSTRAINT_SOLVER_SCS_H */

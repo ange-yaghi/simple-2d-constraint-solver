@@ -7,8 +7,8 @@ atg_scs::ClutchConstraint::ClutchConstraint() : Constraint(1, 2) {
     m_ks = 10.0;
     m_kd = 1.0;
 
-    m_maxTorque = 1000.0;
-    m_minTorque = -1000.0;
+    m_maxTorque = 1000;
+    m_minTorque = -1000;
 }
 
 atg_scs::ClutchConstraint::~ClutchConstraint() {
@@ -25,7 +25,7 @@ void atg_scs::ClutchConstraint::calculate(
     const double q3 = state->theta[body];
     const double q6 = state->theta[linkedBody];
 
-    const double C = q6 - q3;
+    output->C[0] = 0;
 
     output->J[0][0] = 0.0;
     output->J[0][1] = 0.0;
@@ -45,8 +45,6 @@ void atg_scs::ClutchConstraint::calculate(
 
     output->kd[0] = m_kd;
     output->ks[0] = m_ks;
-
-    output->C[0] = q6 - q3;
 
     output->v_bias[0] = 0;
 }

@@ -6,7 +6,7 @@
 atg_scs::ConstantRotationConstraint::ConstantRotationConstraint() : Constraint(1, 1) {
     m_rotationSpeed = 0.0;
     m_maxTorque = DBL_MAX;
-    m_minTorque = DBL_MIN;
+    m_minTorque = -DBL_MAX;
     m_ks = 10.0;
     m_kd = 1.0;
 }

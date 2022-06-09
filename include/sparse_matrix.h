@@ -214,7 +214,7 @@ namespace atg_scs {
             }
 
             void leftScale(Matrix &scale, SparseMatrix<T_Stride> *target) {
-                assert(scale.getWidth() == 1);
+                assert(scale.getWidth() == 1 || m_height == 0);
                 assert(scale.getHeight() == m_height);
 
                 target->initialize(m_width, m_height);

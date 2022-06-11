@@ -17,6 +17,8 @@ void atg_scs::GenericRigidBodySystem::initialize(
 {
     m_sleSolver = sleSolver;
     m_odeSolver = odeSolver;
+
+    m_iv.lambda.initialize(1, 1);
 }
 
 void atg_scs::GenericRigidBodySystem::process(double dt, int steps) {
@@ -177,7 +179,12 @@ void atg_scs::GenericRigidBodySystem::processConstraints(
     auto s1 = std::chrono::steady_clock::now();
 
     const bool solvable =
-        m_sleSolver->solve(m_iv.J_sparse, m_iv.M_inv, m_iv.right, &m_iv.lambda, &m_iv.lambda);
+        m_sleSolver->solve(
+            m_iv.J_sparse,
+            m_iv.M_inv,
+            m_iv.right,
+            &m_iv.lambda,
+            &m_iv.lambda);
     assert(solvable);
 
     auto s2 = std::chrono::steady_clock::now();

@@ -24,6 +24,13 @@ namespace atg_scs {
                 m_matrix[row][column] = value;
             }
 
+            __forceinline void add(int column, int row, double value) {
+                assert(column >= 0 && column < m_width);
+                assert(row >= 0 && row < m_height);
+
+                m_matrix[row][column] += value;
+            }
+
             __forceinline double get(int column, int row) {
                 assert(column >= 0 && column < m_width);
                 assert(row >= 0 && row < m_height);
@@ -34,6 +41,7 @@ namespace atg_scs {
             void set(Matrix *reference);
 
             void multiply(Matrix &b, Matrix *target);
+            void componentMultiply(Matrix &b, Matrix *target);
             void transposeMultiply(Matrix &b, Matrix *target);
             void leftScale(Matrix &scale, Matrix *target);
             void rightScale(Matrix &scale, Matrix *target);
@@ -42,6 +50,11 @@ namespace atg_scs {
             void add(Matrix &b, Matrix *target);
             void negate(Matrix *target);
             bool equals(Matrix &b, double err = 1e-6);
+            double vectorMagnitudeSquared() const;
+            double dot(Matrix &b) const;
+
+            void madd(Matrix &b, double s);
+            void pmadd(Matrix &b, double s);
 
             void transpose(Matrix *target);
             int getWidth() const { return m_width; }

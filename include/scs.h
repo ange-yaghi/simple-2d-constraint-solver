@@ -10,6 +10,7 @@
 
 #include "gauss_seidel_sle_solver.h"
 #include "gaussian_elimination_sle_solver.h"
+#include "conjugate_gradient_sle_solver.h"
 
 #include "static_force_generator.h"
 #include "gravity_force_generator.h"

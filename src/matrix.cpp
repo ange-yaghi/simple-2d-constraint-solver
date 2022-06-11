@@ -109,6 +109,19 @@ void atg_scs::Matrix::multiply(Matrix &b, Matrix *target) {
     }
 }
 
+void atg_scs::Matrix::componentMultiply(Matrix &b, Matrix *target) {
+    assert(m_height == b.m_height);
+    assert(m_width == b.m_width);
+
+    target->resize(m_width, m_height);
+
+    for (int i = 0; i < m_height; ++i) {
+        for (int j = 0; j < m_width; ++j) {
+            target->set(j, i, get(j, i) * b.get(j, i));
+        }
+    }
+}
+
 void atg_scs::Matrix::transposeMultiply(Matrix &b, Matrix *target) {
     assert(m_height == b.m_height);
 
@@ -211,6 +224,52 @@ bool atg_scs::Matrix::equals(Matrix &b, double err) {
     }
 
     return true;
+}
+
+double atg_scs::Matrix::vectorMagnitudeSquared() const {
+    assert(m_width == 1);
+
+    double mag = 0;
+    for (int i = 0; i < m_height; ++i) {
+        mag += m_matrix[0][i] * m_matrix[0][i];
+    }
+
+    return mag;
+}
+
+double atg_scs::Matrix::dot(Matrix &b) const {
+    assert(m_width == 1);
+    assert(b.m_width == 1);
+    assert(b.m_height == m_height);
+
+    double result = 0;
+    for (int i = 0; i < m_height; ++i) {
+        result += m_matrix[0][i] * b.m_matrix[0][i];
+    }
+
+    return result;
+}
+
+void atg_scs::Matrix::madd(Matrix &b, double s) {
+    assert(m_width == b.m_width);
+    assert(m_height == b.m_height);
+
+    for (int i = 0; i < m_height; ++i) {
+        for (int j = 0; j < m_width; ++j) {
+            m_matrix[i][j] += b.m_matrix[i][j] * s;
+        }
+    }
+}
+
+void atg_scs::Matrix::pmadd(Matrix &b, double s) {
+    assert(m_width == b.m_width);
+    assert(m_height == b.m_height);
+
+    for (int i = 0; i < m_height; ++i) {
+        for (int j = 0; j < m_width; ++j) {
+            m_matrix[i][j] = s * m_matrix[i][j] + b.m_matrix[i][j];
+        }
+    }
 }
 
 void atg_scs::Matrix::transpose(Matrix *target) {

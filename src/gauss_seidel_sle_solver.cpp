@@ -6,7 +6,7 @@
 atg_scs::GaussSeidelSleSolver::GaussSeidelSleSolver()
     : atg_scs::SleSolver(true)
 {
-    m_maxIterations = 64;
+    m_maxIterations = 128;
     m_minDelta = 1E-1;
 
     m_M.initialize(1, 1);

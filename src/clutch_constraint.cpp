@@ -48,6 +48,6 @@ void atg_scs::ClutchConstraint::calculate(
 
     output->v_bias[0] = 0;
 
-    output->limits[0][0] = m_maxTorque;
-    output->limits[0][1] = m_minTorque;
+    output->limits[0][0] = m_minTorque;
+    output->limits[0][1] = m_maxTorque;
 }

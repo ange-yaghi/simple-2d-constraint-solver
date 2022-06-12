@@ -3,7 +3,9 @@
 #include <cmath>
 #include <assert.h>
 
-atg_scs::ConjugateGradientSleSolver::ConjugateGradientSleSolver() {
+atg_scs::ConjugateGradientSleSolver::ConjugateGradientSleSolver()
+    : atg_scs::SleSolver(false)
+{
     m_maxIterations = 1000;
     m_maxError = 1E-2;
     m_minError = 1E-3;
@@ -65,7 +67,6 @@ bool atg_scs::ConjugateGradientSleSolver::solve(
         m_p.pmadd(m_r, beta);
     }
 
-failed:
     return false;
 
 succeeded:

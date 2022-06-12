@@ -30,11 +30,7 @@ void atg_scs::ConstantRotationConstraint::calculate(Output *output, SystemState 
     output->C[0] = 0;
 
     output->v_bias[0] = m_rotationSpeed;
-}
 
-void atg_scs::ConstantRotationConstraint::limit(Matrix *lambda, SystemState *state) {
-    const int index = state->indexMap[m_index];
-    const double torque = lambda->get(0, index);
-
-    lambda->set(0, index, std::fmin(m_maxTorque, std::fmax(m_minTorque, torque)));
+    output->limits[0][0] = m_minTorque;
+    output->limits[0][1] = m_maxTorque;
 }

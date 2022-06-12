@@ -5,6 +5,8 @@
 #include "rigid_body.h"
 #include "matrix.h"
 
+#include <cfloat>
+
 namespace atg_scs {
     class Constraint {
         public:
@@ -16,6 +18,7 @@ namespace atg_scs {
                 double J[MaxConstraintCount][3 * MaxBodyCount];
                 double J_dot[MaxConstraintCount][3 * MaxBodyCount];
                 double v_bias[MaxConstraintCount];
+                double limits[MaxConstraintCount][2];
                 double ks[MaxConstraintCount];
                 double kd[MaxConstraintCount];
             };
@@ -26,7 +29,6 @@ namespace atg_scs {
 
             virtual void calculate(Output *output, SystemState *state);
             __forceinline int getConstraintCount() const { return m_constraintCount; }
-            virtual void limit(Matrix *lambda, SystemState *state);
 
             int m_index;
             int m_bodyCount;
@@ -35,6 +37,14 @@ namespace atg_scs {
             double F_x[MaxConstraintCount][MaxBodyCount];
             double F_y[MaxConstraintCount][MaxBodyCount];
             double F_t[MaxConstraintCount][MaxBodyCount];
+
+        protected:
+            inline void noLimits(Output *output) {
+                for (int i = 0; i < MaxConstraintCount; ++i) {
+                    output->limits[i][0] = -DBL_MAX;
+                    output->limits[i][1] = DBL_MAX;
+                }
+            }
 
         protected:
             int m_constraintCount;

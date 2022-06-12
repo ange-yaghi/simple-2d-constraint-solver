@@ -91,6 +91,8 @@ void atg_scs::LinkConstraint::calculate(
 
     output->v_bias[0] = 0;
     output->v_bias[1] = 0;
+
+    noLimits(output);
 }
 
 void atg_scs::LinkConstraint::setLocalPosition1(double x, double y) {

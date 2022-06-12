@@ -13,7 +13,6 @@ namespace atg_scs {
             void setBody2(RigidBody *body) { m_bodies[1] = body; }
 
             virtual void calculate(Output *output, SystemState *system);
-            virtual void limit(atg_scs::Matrix *lambda, atg_scs::SystemState *state);
 
             double m_maxTorque;
             double m_minTorque;

@@ -15,6 +15,13 @@ namespace atg_scs {
                     Matrix &right,
                     Matrix *result,
                     Matrix *previous);
+            virtual bool solveWithLimits(
+                SparseMatrix<3> &J,
+                Matrix &W,
+                Matrix &right,
+                Matrix &limits,
+                Matrix *result,
+                Matrix *previous);
 
             int m_maxIterations;
             double m_minDelta;
@@ -23,6 +30,12 @@ namespace atg_scs {
             double solveIteration(
                     Matrix &left,
                     Matrix &right,
+                    Matrix *result,
+                    Matrix *previous);
+            double solveIteration(
+                    Matrix &left,
+                    Matrix &right,
+                    Matrix &limits,
                     Matrix *result,
                     Matrix *previous);
 

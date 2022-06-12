@@ -28,7 +28,3 @@ atg_scs::Constraint::~Constraint() {
 void atg_scs::Constraint::calculate(Output *output, SystemState *state) {
     /* void */
 }
-
-void atg_scs::Constraint::limit(Matrix *lambda, SystemState *state) {
-    /* void */
-}

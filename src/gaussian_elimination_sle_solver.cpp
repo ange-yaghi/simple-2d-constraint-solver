@@ -4,7 +4,9 @@
 #include <assert.h>
 #include <fstream>
 
-atg_scs::GaussianEliminationSleSolver::GaussianEliminationSleSolver() {
+atg_scs::GaussianEliminationSleSolver::GaussianEliminationSleSolver()
+    : atg_scs::SleSolver(false)
+{
     m_a.initialize(1, 1);
     m_M.initialize(1, 1);
 }

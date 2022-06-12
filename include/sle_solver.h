@@ -7,7 +7,7 @@
 namespace atg_scs {
     class SleSolver {
         public:
-            SleSolver();
+            SleSolver(bool supportsLimits);
             virtual ~SleSolver();
 
             virtual bool solve(
@@ -16,6 +16,18 @@ namespace atg_scs {
                     Matrix &right,
                     Matrix *result,
                     Matrix *previous);
+            virtual bool solveWithLimits(
+                    SparseMatrix<3> &J,
+                    Matrix &W,
+                    Matrix &right,
+                    Matrix &limits,
+                    Matrix *result,
+                    Matrix *previous);
+
+            bool supportsLimits() const { return m_supportsLimits; }
+
+        private:
+            bool m_supportsLimits;
     };
 } /* namespace atg_scs */
 

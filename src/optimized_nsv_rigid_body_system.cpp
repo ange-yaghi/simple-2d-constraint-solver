@@ -110,6 +110,7 @@ void atg_scs::OptimizedNsvRigidBodySystem::processConstraints(
     m_iv.J_sparse.initialize(3 * n, m_f);
     m_iv.v_bias.initialize(1, m_f);
     m_iv.C.initialize(1, m_f);
+    m_iv.limits.initialize(2, m_f);
 
     Constraint::Output constraintOutput;
     for (int j = 0, j_f = 0; j < m; ++j) {
@@ -136,6 +137,8 @@ void atg_scs::OptimizedNsvRigidBodySystem::processConstraints(
 
             m_iv.v_bias.set(0, j_f, constraintOutput.v_bias[k]);
             m_iv.C.set(0, j_f, constraintOutput.C[k]);
+            m_iv.limits.set(0, j_f, constraintOutput.limits[k][0] * dt);
+            m_iv.limits.set(1, j_f, constraintOutput.limits[k][1] * dt);
         }
     }
 
@@ -172,8 +175,27 @@ void atg_scs::OptimizedNsvRigidBodySystem::processConstraints(
 
     auto s1 = std::chrono::steady_clock::now();
 
-    const bool solvable =
-        m_sleSolver->solve(m_iv.J_sparse, m_iv.M_inv, m_iv.right, &m_iv.lambda, &m_iv.lambda);
+    bool solvable = false;
+    if (!m_sleSolver->supportsLimits()) {
+        solvable =
+            m_sleSolver->solve(
+                m_iv.J_sparse,
+                m_iv.M_inv,
+                m_iv.right,
+                &m_iv.lambda,
+                &m_iv.lambda);
+    }
+    else {
+        solvable =
+            m_sleSolver->solveWithLimits(
+                m_iv.J_sparse,
+                m_iv.M_inv,
+                m_iv.right,
+                m_iv.limits,
+                &m_iv.lambda,
+                &m_iv.lambda);
+    }
+
     assert(solvable);
 
     auto s2 = std::chrono::steady_clock::now();
@@ -185,11 +207,6 @@ void atg_scs::OptimizedNsvRigidBodySystem::processConstraints(
     //  => transpose(J.leftScale(lambda_scale)) = R
 
     m_iv.lambda.scale(1 / dt, &m_iv.reg0);
-
-    for (int i = 0; i < m; ++i) {
-        m_constraints[i]->limit(&m_iv.reg0, &m_state);
-    }
-
     m_iv.J_sparse.leftScale(m_iv.reg0, &m_iv.sreg0);
 
     for (int i = 0; i < m_f; ++i) {

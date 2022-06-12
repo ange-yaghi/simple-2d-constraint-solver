@@ -47,13 +47,7 @@ void atg_scs::ClutchConstraint::calculate(
     output->ks[0] = m_ks;
 
     output->v_bias[0] = 0;
-}
 
-void atg_scs::ClutchConstraint::limit(
-    atg_scs::Matrix *lambda,
-    atg_scs::SystemState *state)
-{
-    const int index = state->indexMap[m_index];
-    const double calculatedTorque = lambda->get(0, index);
-    lambda->set(0, index, std::fmin(m_maxTorque, std::fmax(m_minTorque, calculatedTorque)));
+    output->limits[0][0] = m_maxTorque;
+    output->limits[0][1] = m_minTorque;
 }

@@ -80,4 +80,6 @@ void atg_scs::FixedPositionConstraint::calculate(
 
     output->v_bias[0] = 0;
     output->v_bias[1] = 0;
+
+    noLimits(output);
 }

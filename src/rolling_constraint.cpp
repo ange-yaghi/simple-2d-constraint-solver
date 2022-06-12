@@ -150,4 +150,6 @@ void atg_scs::RollingConstraint::calculate(
 
     output->v_bias[0] = 0;
     output->v_bias[1] = 0;
+
+    noLimits(output);
 }

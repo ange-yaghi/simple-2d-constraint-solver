@@ -57,6 +57,7 @@ add_library(simple-2d-constraint-solver STATIC
     src/optimized_nsv_rigid_body_system.cpp
     src/clutch_constraint.cpp
     src/conjugate_gradient_sle_solver.cpp
+    src/rotation_friction_constraint.cpp
 
     # Header files
     include/rigid_body_system.h
@@ -88,6 +89,7 @@ add_library(simple-2d-constraint-solver STATIC
     include/optimized_nsv_rigid_body_system.h
     include/clutch_constraint.h
     include/conjugate_gradient_sle_solver.h
+    include/rotation_friction_constraint.h
 )
 
 # GTEST

@@ -1,9 +1,8 @@
-#include "../include/clutch_constraint.h"
+#include "../include/rotation_friction_constraint.h"
 
-#include <cmath>
 #include <cfloat>
 
-atg_scs::ClutchConstraint::ClutchConstraint() : Constraint(1, 2) {
+atg_scs::RotationFrictionConstraint::RotationFrictionConstraint() : Constraint(1, 1) {
     m_ks = 10.0;
     m_kd = 1.0;
 
@@ -11,31 +10,25 @@ atg_scs::ClutchConstraint::ClutchConstraint() : Constraint(1, 2) {
     m_minTorque = -DBL_MAX;
 }
 
-atg_scs::ClutchConstraint::~ClutchConstraint() {
+atg_scs::RotationFrictionConstraint::~RotationFrictionConstraint() {
     /* void */
 }
 
-void atg_scs::ClutchConstraint::calculate(
+void atg_scs::RotationFrictionConstraint::calculate(
         Output *output,
         SystemState *state)
 {
+    const int body = m_bodies[0]->index;
+
     output->C[0] = 0;
 
     output->J[0][0] = 0.0;
     output->J[0][1] = 0.0;
-    output->J[0][2] = -1.0;
-
-    output->J[0][3] = 0.0;
-    output->J[0][4] = 0.0;
-    output->J[0][5] = 1.0;
+    output->J[0][2] = 1.0;
 
     output->J_dot[0][0] = 0;
     output->J_dot[0][1] = 0;
     output->J_dot[0][2] = 0;
-
-    output->J_dot[0][3] = 0;
-    output->J_dot[0][4] = 0;
-    output->J_dot[0][5] = 0;
 
     output->kd[0] = m_kd;
     output->ks[0] = m_ks;

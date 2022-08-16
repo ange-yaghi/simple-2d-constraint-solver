@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <assert.h>
+#include <cstring>
 
 atg_scs::Matrix::Matrix() {
     m_matrix = nullptr;

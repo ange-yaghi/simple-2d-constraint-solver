@@ -9,7 +9,24 @@ atg_scs::OptimizedNsvRigidBodySystem::OptimizedNsvRigidBodySystem() {
 }
 
 atg_scs::OptimizedNsvRigidBodySystem::~OptimizedNsvRigidBodySystem() {
-    /* void */
+    m_iv.J_sparse.destroy();
+    m_iv.sreg0.destroy();
+    m_iv.C.destroy();
+    m_iv.M.destroy();
+    m_iv.M_inv.destroy();
+    m_iv.b_err.destroy();
+    m_iv.v_bias.destroy();
+    m_iv.limits.destroy();
+    m_iv.q_dot.destroy();
+    m_iv.q_dot_prime.destroy();
+    m_iv.reg0.destroy();
+    m_iv.reg1.destroy();
+    m_iv.reg2.destroy();
+    m_iv.right.destroy();
+    m_iv.F_ext.destroy();
+    m_iv.F_C.destroy();
+    m_iv.R.destroy();
+    m_iv.lambda.destroy();
 }
 
 void atg_scs::OptimizedNsvRigidBodySystem::initialize(SleSolver *sleSolver) {

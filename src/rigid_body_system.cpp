@@ -24,6 +24,8 @@ atg_scs::RigidBodySystem::~RigidBodySystem() {
     delete[] m_constraintSolveMicroseconds;
     delete[] m_forceEvalMicroseconds;
     delete[] m_constraintEvalMicroseconds;
+
+    m_state.destroy();
 }
 
 void atg_scs::RigidBodySystem::reset() {

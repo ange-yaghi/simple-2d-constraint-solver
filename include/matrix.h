@@ -3,6 +3,10 @@
 
 #include <assert.h>
 
+#if !defined(_MSC_VER)
+#define __forceinline inline    // __attribute__((always_inline)) for gcc?
+#endif
+
 namespace atg_scs {
     class Matrix {
         public:

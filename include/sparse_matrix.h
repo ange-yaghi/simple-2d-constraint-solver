@@ -5,6 +5,8 @@
 #include <stdint.h>
 #include <string.h>
 
+#include "./matrix.h"
+
 namespace atg_scs {
     class Matrix;
 

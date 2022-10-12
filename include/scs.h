@@ -18,6 +18,7 @@
 #include "constant_speed_motor.h"
 
 #include "fixed_position_constraint.h"
+#include "fixed_rotation_constraint.h"
 #include "link_constraint.h"
 #include "line_constraint.h"
 #include "rolling_constraint.h"

@@ -29,6 +29,7 @@ set_property(TARGET gtest_main PROPERTY FOLDER "gtest")
 
 add_library(simple-2d-constraint-solver STATIC
     # Source files
+    src/fixed_rotation_constraint.cpp
     src/rigid_body_system.cpp
     src/matrix.cpp
     src/system_state.cpp
@@ -60,6 +61,7 @@ add_library(simple-2d-constraint-solver STATIC
     src/rotation_friction_constraint.cpp
 
     # Header files
+    include/fixed_rotation_constraint.h
     include/rigid_body_system.h
     include/matrix.h
     include/utilities.h

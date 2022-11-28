@@ -1,6 +1,7 @@
 #include "../include/gravity_force_generator.h"
 
 //may need improvement - reference: https://nssdc.gsfc.nasa.gov/planetary/factsheet/planet_table_ratio.html
+#define SUN_GRAVITY (274)
 #define EARTH_GRAVITY (9.81)
 #define MERCURY_GRAVITY (0.378*EARTH_GRAVITY)
 #define VENUS_GRAVITY (0.907*EARTH_GRAVITY)

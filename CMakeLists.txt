@@ -59,6 +59,7 @@ add_library(simple-2d-constraint-solver STATIC
     src/clutch_constraint.cpp
     src/conjugate_gradient_sle_solver.cpp
     src/rotation_friction_constraint.cpp
+    src/simple_gear_constraint.cpp
 
     # Header files
     include/fixed_rotation_constraint.h
@@ -92,6 +93,7 @@ add_library(simple-2d-constraint-solver STATIC
     include/clutch_constraint.h
     include/conjugate_gradient_sle_solver.h
     include/rotation_friction_constraint.h
+    include/simple_gear_constraint.h
 )
 
 # GTEST

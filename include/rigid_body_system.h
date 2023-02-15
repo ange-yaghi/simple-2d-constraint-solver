@@ -43,6 +43,8 @@ namespace atg_scs {
             float getForceEvalMicroseconds() const;
             float getConstraintEvalMicroseconds() const;
 
+            inline const SystemState *state() const { return &m_state; }
+
         protected:
             static float findAverage(long long *samples);
 

@@ -6,6 +6,7 @@
 atg_scs::OptimizedNsvRigidBodySystem::OptimizedNsvRigidBodySystem() {
     m_sleSolver = nullptr;
     m_biasFactor = 1.0;
+    m_t = 0.0;
 }
 
 atg_scs::OptimizedNsvRigidBodySystem::~OptimizedNsvRigidBodySystem() {
@@ -81,6 +82,8 @@ void atg_scs::OptimizedNsvRigidBodySystem::process(double dt, int steps) {
     m_forceEvalMicroseconds[m_frameIndex] = forceEvalTime;
     m_constraintEvalMicroseconds[m_frameIndex] = constraintEvalTime;
     m_frameIndex = (m_frameIndex + 1) % ProfilingSamples;
+
+    m_t += dt;
 }
 
 void atg_scs::OptimizedNsvRigidBodySystem::propagateResults() {

@@ -15,6 +15,8 @@ namespace atg_scs {
             void initialize(SleSolver *sleSolver);
             virtual void process(double dt, int steps = 1);
 
+            inline double timeElapsed() const { return m_t; }
+
             double m_biasFactor;
 
         protected:
@@ -27,6 +29,8 @@ namespace atg_scs {
         protected:
             NsvOdeSolver m_odeSolver;
             SleSolver *m_sleSolver;
+
+            double m_t;
 
         protected:
             struct IntermediateValues {

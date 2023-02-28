@@ -17,6 +17,8 @@ namespace atg_scs {
 
             virtual void calculate(Output *output, SystemState *system);
 
+            double m_maxForce;
+
             double m_local_x_1;
             double m_local_y_1;
             double m_local_x_2;

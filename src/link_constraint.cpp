@@ -7,6 +7,7 @@ atg_scs::LinkConstraint::LinkConstraint() : Constraint(2, 2) {
     m_local_x_2 = m_local_y_2 = 0.0;
     m_ks = 10.0;
     m_kd = 1.0;
+    m_maxForce = DBL_MAX;
 }
 
 atg_scs::LinkConstraint::~LinkConstraint() {
@@ -92,7 +93,11 @@ void atg_scs::LinkConstraint::calculate(
     output->v_bias[0] = 0;
     output->v_bias[1] = 0;
 
-    noLimits(output);
+    output->limits[0][0] = -m_maxForce;
+    output->limits[0][1] = m_maxForce;
+
+    output->limits[1][0] = -m_maxForce;
+    output->limits[1][1] = m_maxForce;
 }
 
 void atg_scs::LinkConstraint::setLocalPosition1(double x, double y) {

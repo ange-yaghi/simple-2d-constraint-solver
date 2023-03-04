@@ -7,9 +7,11 @@ project(simple-2d-constraint-solver)
 
 set(CMAKE_CXX_STANDARD 11)
 
+option(USE_EIGEN ON)
+SET(USE_EIGEN 1)
+
 # ========================================================
 # GTEST
-
 include(FetchContent)
 FetchContent_Declare(
     googletest
@@ -26,12 +28,18 @@ set_property(TARGET gtest PROPERTY FOLDER "gtest")
 set_property(TARGET gtest_main PROPERTY FOLDER "gtest")
 
 # ========================================================
+if(USE_EIGEN)
+    include_directories(dependencies/eigen)
+    add_definitions(-DATG_S2C_USE_EIGEN)
+endif(USE_EIGEN)
 
 add_library(simple-2d-constraint-solver STATIC
+
     # Source files
     src/fixed_rotation_constraint.cpp
     src/rigid_body_system.cpp
-    src/matrix.cpp
+    src/matrix_custom.cpp
+    src/matrix_eigen.cpp
     src/system_state.cpp
     src/utilities.cpp
     src/ode_solver.cpp
@@ -65,6 +73,8 @@ add_library(simple-2d-constraint-solver STATIC
     include/fixed_rotation_constraint.h
     include/rigid_body_system.h
     include/matrix.h
+    include/matrix_eigen.h
+    include/matrix_custom.h
     include/utilities.h
     include/system_state.h
     include/ode_solver.h
@@ -97,10 +107,10 @@ add_library(simple-2d-constraint-solver STATIC
 )
 
 # GTEST
-
 enable_testing()
 
 add_executable(simple-2d-constraint-solver-test
+
     # Source files
     test/sanity_tests.cpp
     test/matrix_tests.cpp

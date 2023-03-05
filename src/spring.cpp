@@ -47,12 +47,12 @@ void atg_scs::Spring::apply(SystemState *state) {
 
     const double l = std::sqrt(dx * dx + dy * dy);
 
-    if (l != 0) {
+    if (std::abs(l) >= 1E-2) {
         dx /= l;
         dy /= l;
     }
     else {
-        dx = 1.0;
+        dx = 0.0;
         dy = 0.0;
     }
 
@@ -65,16 +65,16 @@ void atg_scs::Spring::apply(SystemState *state) {
     state->applyForce(
         m_p1_x,
         m_p1_y,
-        dx * (x * m_ks + v * m_kd),
-        dy * (x * m_ks + v * m_kd),
+        dx * x * m_ks + rel_v_x * m_kd,
+        dy * x * m_ks + rel_v_y * m_kd,
         m_body1->index
     );
 
     state->applyForce(
         m_p2_x,
         m_p2_y,
-        -dx * (x * m_ks + v * m_kd),
-        -dy * (x * m_ks + v * m_kd),
+        -dx * x * m_ks - rel_v_x * m_kd,
+        -dy * x * m_ks - rel_v_y * m_kd,
         m_body2->index
     );
 }

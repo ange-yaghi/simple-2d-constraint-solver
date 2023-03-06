@@ -1,6 +1,7 @@
 #ifndef ATG_SIMPLE_2D_CONSTRAINT_SOLVER_MATRIX_H
 #define ATG_SIMPLE_2D_CONSTRAINT_SOLVER_MATRIX_H
 
+#include "utilities.h"
 #include <assert.h>
 
 namespace atg_scs {
@@ -17,21 +18,21 @@ namespace atg_scs {
 
             void set(const double *data);
 
-            __forceinline void set(int column, int row, double value) {
+            scs_force_inline void set(int column, int row, double value) {
                 assert(column >= 0 && column < m_width);
                 assert(row >= 0 && row < m_height);
 
                 m_matrix[row][column] = value;
             }
 
-            __forceinline void add(int column, int row, double value) {
+            scs_force_inline void add(int column, int row, double value) {
                 assert(column >= 0 && column < m_width);
                 assert(row >= 0 && row < m_height);
 
                 m_matrix[row][column] += value;
             }
 
-            __forceinline double get(int column, int row) {
+            scs_force_inline double get(int column, int row) {
                 assert(column >= 0 && column < m_width);
                 assert(row >= 0 && row < m_height);
 
@@ -60,7 +61,7 @@ namespace atg_scs {
             int getWidth() const { return m_width; }
             int getHeight() const { return m_height; }
 
-            __forceinline void fastRowSwap(int a, int b) {
+            scs_force_inline void fastRowSwap(int a, int b) {
                 double *temp = m_matrix[a];
                 m_matrix[a] = m_matrix[b];
                 m_matrix[b] = temp;

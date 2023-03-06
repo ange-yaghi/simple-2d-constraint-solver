@@ -4,6 +4,7 @@
 #include "system_state.h"
 #include "rigid_body.h"
 #include "matrix.h"
+#include "utilities.h"
 
 #include <cfloat>
 
@@ -28,7 +29,7 @@ namespace atg_scs {
             virtual ~Constraint();
 
             virtual void calculate(Output *output, SystemState *state);
-            __forceinline int getConstraintCount() const { return m_constraintCount; }
+            scs_force_inline int getConstraintCount() const { return m_constraintCount; }
 
             int m_index;
             int m_bodyCount;

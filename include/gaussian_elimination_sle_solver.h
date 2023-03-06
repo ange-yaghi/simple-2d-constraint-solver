@@ -3,6 +3,8 @@
 
 #include "sle_solver.h"
 
+#include "utilities.h"
+
 namespace atg_scs {
     class GaussianEliminationSleSolver : public SleSolver {
         public:
@@ -16,7 +18,7 @@ namespace atg_scs {
                     Matrix *result,
                     Matrix *previous);
 
-            static __forceinline double fastAbs(double v) {
+            static scs_force_inline double fastAbs(double v) {
                 return (v > 0)
                     ? v
                     : -v;

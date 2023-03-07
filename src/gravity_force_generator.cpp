@@ -1,7 +1,7 @@
 #include "../include/gravity_force_generator.h"
 
 atg_scs::GravityForceGenerator::GravityForceGenerator() {
-    m_g = 9.81;
+    m_g = EARTH_GRAVITY;
 }
 
 atg_scs::GravityForceGenerator::~GravityForceGenerator() {

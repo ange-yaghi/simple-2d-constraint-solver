@@ -9,6 +9,10 @@
 #include <stdint.h>
 #include <string.h>
 
+#ifndef WIN32
+#define __forceinline __attribute__((always_inline))
+#endif
+
 namespace atg_scs {
 
     template <int T_Stride = 3, int T_Entries = 2>

@@ -9,6 +9,8 @@
 #include <stdint.h>
 #include <string.h>
 
+#include "./matrix.h"
+
 namespace atg_scs {
 
     template <int T_Stride = 3, int T_Entries = 2>

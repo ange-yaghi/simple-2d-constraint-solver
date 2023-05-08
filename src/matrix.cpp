@@ -3,6 +3,10 @@
 #include <algorithm>
 #include <assert.h>
 
+#if defined(__GNUG__)
+#include <cstring>
+#endif
+
 atg_scs::Matrix::Matrix() {
     m_matrix = nullptr;
     m_data = nullptr;

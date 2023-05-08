@@ -3,6 +3,8 @@
 
 #if defined(__APPLE__)
 #define scs_force_inline inline
+#elif defined(__GNUG__)
+#define scs_force_inline __attribute__((always_inline))
 #else
 #define scs_force_inline __forceinline
 #endif

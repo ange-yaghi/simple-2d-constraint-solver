@@ -18,7 +18,7 @@ void atg_scs::GenericRigidBodySystem::initialize(
     m_sleSolver = sleSolver;
     m_odeSolver = odeSolver;
 
-    m_iv.lambda.initialize(1, 1);
+    m_iv.lambda.initialize(0, 0);
 }
 
 void atg_scs::GenericRigidBodySystem::process(double dt, int steps) {

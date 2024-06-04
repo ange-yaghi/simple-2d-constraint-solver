@@ -231,7 +231,7 @@ double atg_scs::Matrix::vectorMagnitudeSquared() const {
 
     double mag = 0;
     for (int i = 0; i < m_height; ++i) {
-        mag += m_matrix[0][i] * m_matrix[0][i];
+        mag += m_matrix[i][0] * m_matrix[i][0];
     }
 
     return mag;
@@ -244,7 +244,7 @@ double atg_scs::Matrix::dot(Matrix &b) const {
 
     double result = 0;
     for (int i = 0; i < m_height; ++i) {
-        result += m_matrix[0][i] * b.m_matrix[0][i];
+        result += m_matrix[i][0] * b.m_matrix[i][0];
     }
 
     return result;
